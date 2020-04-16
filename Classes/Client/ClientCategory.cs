@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Windows;
+
 using CertifyWPF.WPF_Library;
 using CertifyWPF.WPF_Utils;
-using MaterialDesignThemes.Wpf;
+
 
 namespace CertifyWPF.WPF_Client
 {
@@ -200,43 +200,6 @@ namespace CertifyWPF.WPF_Client
                 if (useId != -1) uses.Add(useId);
             }
             return uses;
-        }
-
-
-
-        /// <summary>
-        /// Get the Client Category's associated icon.
-        /// </summary>
-        /// <param name="categoryName"> The name of the catgeory</param>
-        /// <returns></returns>
-        //--------------------------------------------------------------------------------------------------------------------------
-        public static PackIconKind getIconKind(string categoryName)
-        {
-
-            if (categoryName == "Producer - Livestock") return PackIconKind.Cow;
-            if (categoryName == "Producer - Dairy") return PackIconKind.Cow;
-            if (categoryName == "Producer - Poultry") return PackIconKind.EggEaster;
-            if (categoryName == "Producer - Pigs") return PackIconKind.Pig;
-            if (categoryName == "Producer - Aquaculture") return PackIconKind.Fish;
-
-            if (categoryName == "Producer - Horticulture") return PackIconKind.Carrot;
-            if (categoryName == "Producer - Mushrooms") return PackIconKind.Mushroom;
-            if (categoryName == "Producer - Sprouts, Barley or Wheat Grass") return PackIconKind.Barley;
-            if (categoryName == "Producer - Viticulture") return PackIconKind.GlassWine;
-            if (categoryName == "Producer - Grain") return PackIconKind.Barley;
-            if (categoryName == "Producer - Hay") return PackIconKind.Barley;
-
-            if (categoryName == "Transporter") return PackIconKind.VanUtility;
-            if (categoryName == "Importer") return PackIconKind.Ship;
-            if (categoryName == "Exporter") return PackIconKind.Ship;
-
-            if (categoryName == "Wholesaler") return PackIconKind.OfficeBuilding;
-            if (categoryName == "Retailer") return PackIconKind.Cart;
-            if (categoryName == "Repacker") return PackIconKind.Refresh;
-
-            if (categoryName == "Processor") return PackIconKind.Factory;
-
-            return PackIconKind.QuestionMark;
         }
 
 
