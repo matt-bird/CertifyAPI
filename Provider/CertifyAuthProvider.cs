@@ -24,7 +24,9 @@ namespace CertifyWPF.Provider
             // Password Success
             User user = User.getFromEmailAddress(context.UserName);
 
-            if (user.password == context.Password && user.active == true)
+            if (user!= null && 
+                user.password == context.Password && 
+                user.active == true)
             {
                 // create identity
                 var id = new ClaimsIdentity(context.Options.AuthenticationType);
