@@ -24,7 +24,7 @@ namespace CertifyWPF.Controllers
                 if (!String.IsNullOrEmpty(client.company))
                     return JsonConvert.SerializeObject(client, Newtonsoft.Json.Formatting.Indented);
             }
-            return "Error - Client Not Found";
+            return "Error - Client Not Found - Fuck off";
         }
 
         // POST: api/Client
