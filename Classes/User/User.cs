@@ -11,11 +11,8 @@ namespace CertifyWPF.WPF_User
     /// <summary>
     /// Certify Users.  Users can be general public (registered users from Certify Web), staff, auditors and laboratory staff.
     /// Users may also be deemed as "Admin" with very high levels of access.  All Users have an entry in the <strong>user</strong> 
-    /// table.  Depending on the user, they may also have entries in the <strong>userAuditor, userStaff or userLab</strong> tables.
-    /// Users may also have User Restricions - which are defined in the <strong>userRestrictions</strong> table.  These are 
-    /// limitations place on certain types of users due to pecuniary interests.  Staff and Auditors also have entries in 
-    /// the <strong>userTraining and userTrainingMatrix</strong> tables to assisst with training obligations.
-    /// <para/>
+    /// table.  Users may also have User Restricions - which are defined in the <strong>userRestrictions</strong> table.  These are 
+    /// limitations placed on certain types of users due to pecuniary interests. 
     /// <para/> Web Users must be authorised for a Client in order for the Web User to view the Clients information.  Authorised user
     /// information is stored in the <strong>userWebClient</strong> table.
     /// via Certify Web.
@@ -278,139 +275,11 @@ namespace CertifyWPF.WPF_User
                 trainingPlan = row["trainingPlan"].ToString();
                 password = row["password"].ToString();
                 passwordSalt = row["passwordSalt"].ToString();
-
-                //Get related User details
-                records = mySql.getRecords("SELECT * FROM userWeb WHERE isDeleted = 0 AND userId = @userId");
-                if (records.Rows.Count == 1) webId = Convert.ToInt64(records.Rows[0]["id"].ToString());
-
-                records = mySql.getRecords("SELECT * FROM userAuditor WHERE isDeleted = 0 AND userId = @userId");
-                if (records.Rows.Count == 1) auditorId = Convert.ToInt64(records.Rows[0]["id"].ToString());
-
-                records = mySql.getRecords("SELECT * FROM userStaff WHERE isDeleted = 0 AND userId = @userId");
-                if (records.Rows.Count == 1) staffId = Convert.ToInt64(records.Rows[0]["id"].ToString());
-
                 active = Convert.ToBoolean(row["active"].ToString());
                 isAdmin = Convert.ToBoolean(row["isAdmin"].ToString());
                 sendNewsletter = Convert.ToBoolean(row["sendNewsletter"].ToString());
                 sendPromotions = Convert.ToBoolean(row["sendPromotions"].ToString());
             }
-        }
-
-
-        /// <summary>
-        /// Determine if a User has a particular role such as "Auditor" or "Staff"
-        /// </summary>
-        /// <param name="role">"userWeb", "userAuditor", "userStaff", "userLab"</param>
-        /// <returns>True if the User has the role.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool isUserRole(string role)
-        {
-            if (userId == -1) return false;
-
-            SQL mySql = new SQL();
-            mySql.addParameter("userId", userId.ToString());
-            DataTable records = mySql.getRecords("SELECT * FROM " + role + " WHERE isDeleted = 0 AND userId = @userId");
-            if (records.Rows.Count == 1) return true;
-            return false;
-        }
-
-
-        /// <summary>
-        /// Determine if a User's role has been marked as deleted. 
-        /// </summary>
-        /// <param name="role">"userWeb", "userAuditor", "userStaff", "userLab"</param>
-        /// <returns>True if the User's role has been deleted.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool isUserRoleDeleted(string role)
-        {
-            if (userId == -1) return false;
-
-            SQL mySql = new SQL();
-            mySql.addParameter("userId", userId.ToString());
-            DataTable records = mySql.getRecords("SELECT * FROM " + role + " WHERE isDeleted = 1 AND userId = @userId");
-            if (records.Rows.Count == 1) return true;
-            return false;
-        }
-
-
-        /// <summary>
-        /// Create a role for a User. 
-        /// </summary>
-        /// <param name="role">"userWeb", "userAuditor", "userStaff", "userLab"</param>
-        /// <returns>True if the role was successfully created for the User.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public long createUserRole(string role)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("userId", userId.ToString());
-
-            bool userHasRole = isUserRole(role);
-            bool userIsDeleted = isUserRoleDeleted(role);
-
-            // If the user does not already have this role - create it
-            if (!userHasRole)
-            {
-                string fields = " (userId";
-                string values = "(@userId";
-                if (role == "userWeb")
-                {
-                    fields += ", isConfirmed)";
-                    values += ", 1)";
-                }
-                else
-                {
-                    fields += ")";
-                    values += ")";
-                }
-                // Create the role
-                long id = -1;
-                mySql.setQuery("INSERT INTO " + role + fields + " VALUES " + values);
-                if (mySql.executeSQL() == 1)
-                {
-                    id = mySql.getMaxId(role);
-                }
-                return id;
-            }
-
-            else
-            {
-                // User exists and has the role, but the role is marked as deleted
-                if (userIsDeleted)
-                {
-                    mySql.setQuery("UPDATE " + role + " SET isDeleted = 0 WHERE userId = @userId");
-                    if (mySql.executeSQL() != 1) return -1;
-                }
-
-                //User already has this role and is not already deleted - get that roles id
-                DataTable records = mySql.getRecords("SELECT id from " + role + " WHERE userId = @userId");
-                if (records.Rows.Count == 1) return Convert.ToInt64(records.Rows[0]["id"].ToString());
-                return -1;
-            }
-        }
-
-
-        /// <summary>
-        /// Mark a User's role as deleted.
-        /// </summary>
-        /// <param name="role">"userWeb", "userAuditor", "userStaff", "userLab"</param>
-        /// <returns>True if the role was successfully marked as deleted for the User.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool deleteUserRole(string role)
-        {
-            // User does not have role - return true to indicate the user is deleted
-            if (!isUserRole(role)) return true;
-
-            // User has role, and is currently not deleted - so delete
-            if (!isUserRoleDeleted(role))
-            {
-                SQL mySql = new SQL();
-                mySql.addParameter("userId", userId.ToString());
-                mySql.setQuery("UPDATE " + role + " SET isDeleted = 1 WHERE userId = @userId");
-                if (mySql.executeSQL() == 1) return true;
-                return false;
-            }
-
-            return false;
         }
 
 
@@ -431,154 +300,6 @@ namespace CertifyWPF.WPF_User
             if (records.Rows.Count == 1) return true;
             return false;
         }
-
-
-        /// <summary>
-        /// Determine if a Web User was once assigned as an authorised user for a Client, but this has been marked 
-        /// as Deleted.
-        /// </summary>
-        /// <param name="clientId">The primary key Id of the Client.</param>
-        /// <returns>True if the Web User was once assigned as an authorised user for a Client, but this has been marked 
-        /// as Deleted. False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool isUserWebClientDeleted(long clientId)
-        {
-            // If user or climent ID == -1 retun true, as, well, I courldnt think of anything else to do at this point
-            if (webId == -1 || clientId == -1) return true;
-
-            // If user doesn;t blong to the client, then return true - again - not sure what else to do at this point.
-            if (!doesUserBelongToClient(clientId)) return true;
-            
-            SQL mySql = new SQL();
-            mySql.addParameter("userWebId", webId.ToString());
-            mySql.addParameter("clientId", clientId.ToString());
-
-            // If the user belongs to the client and is not deleted, return false
-            DataTable records = mySql.getRecords("SELECT * FROM userWebClient WHERE (userWebId = @userWebId AND clientId = @clientId AND isDeleted = 0)");
-            if (records.Rows.Count == 1) return false;
-
-            // If we get here, user belongs to client, and is deleted
-            return true;
-        }
-
-
-        /// <summary>
-        /// Add a Web User as an authorised User for a Client.
-        /// </summary>
-        /// <param name="clientId">The primary key Id of the Client.</param>
-        /// <returns>True if the Web User was successfully authorised.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool addWebUserToClient(long clientId)
-        {
-            if (webId == -1 || clientId == -1) return false;
-
-            SQL mySql = new SQL();
-            mySql.addParameter("userWebId", webId.ToString());
-            mySql.addParameter("clientId", clientId.ToString());
-
-            bool userBelongs = doesUserBelongToClient(clientId);
-            bool isDeleted = isUserWebClientDeleted(clientId);
-
-            // user already belongs to cleint and is not deleted
-            if (userBelongs && !isDeleted) return true;
-
-            // User does belong, but this has been previously deleted
-            if(userBelongs && isDeleted)
-            {
-                mySql.setQuery("UPDATE userWebClient SET isDeleted = 0 WHERE userWebId = @userWebId AND clientId = @clientId");
-                if (mySql.executeSQL() == 1) return true;
-            }
-
-            // User does not belong to the client so create
-            if(!userBelongs)
-            {
-                mySql.setQuery("INSERT INTO userWebClient (userWebId, clientId, admin) VAlUES (@userWebId, @clientId, 0)");
-                if (mySql.executeSQL() == 1) return true;
-            }
-            return false;
-        }
-
-
-        /// <summary>
-        /// Mark an authorised Web User for a Client as deleted.
-        /// </summary>
-        /// <param name="clientId">The primary key Id of the Client.</param>
-        /// <returns>True if the Web User was successfully marked as deleted.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool deleteWebUserFromClient(long clientId)
-        {
-            if (webId == -1 || clientId == -1) return true;
-
-            // user already belongs to Client and is not deleted
-            if (doesUserBelongToClient(clientId) && !isUserWebClientDeleted(clientId))
-            {
-                SQL mySql = new SQL();
-                mySql.addParameter("userWebId", webId.ToString());
-                mySql.addParameter("clientId", clientId.ToString());
-                mySql.setQuery("UPDATE userWebClient SET isDeleted = 1 WHERE userWebId = @userWebId AND clientId = @clientId");
-                if (mySql.executeSQL() == 1) return true;
-            }
-            return true;
-        }
-
-
-
-        /// <summary>
-        /// Reset a Users password to the default password and password salt.
-        /// </summary>
-        /// <returns>True if the password was reset.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool resetPassword()
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("userId", userId.ToString());
-
-            // Default Password = h0neyB33 = 6732F21FF7E8A7A76CE0426C76BE0B0155352D67C588608C8BF8D7FF4AB6B0A6
-            // Default Salt = cRdWiWpJEjPZ8gjq6P1SQLkHTuM=
-            password = "6732F21FF7E8A7A76CE0426C76BE0B0155352D67C588608C8BF8D7FF4AB6B0A6";
-            passwordSalt = "cRdWiWpJEjPZ8gjq6P1SQLkHTuM=";
-
-            mySql.addParameter("password", password);
-            mySql.addParameter("passwordSalt", passwordSalt);
-
-            mySql.setQuery("UPDATE [user] Set password = @password, passwordSalt = @passwordSalt WHERE id = @userId");
-            if (mySql.executeSQL() == 1) return true;
-
-            return false;
-        }
-
-
-        /// <summary>
-        /// Unlock a Users Web Access if the Access had been previously locked due to too many login attempts.
-        /// </summary>
-        /// <returns>True if the access was unlocked.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool unlockWebAccess()
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("userId", userId.ToString());
-            mySql.addParameter("lockoutEnd", null);
-            mySql.setQuery("UPDATE [userWeb] Set lockoutEndDateTime = @lockoutEnd, failedLoginCount = 0 WHERE userId = @userId");
-            if (mySql.executeSQL() == 1) return true;
-            return false;
-        }
-
-
-        /// <summary>
-        /// Confirm a Users Email address manually.  Ordinarily, this is done by the user who clicks a link in their Welcome email.  
-        /// But for users who are created using the desktop application, this must be done manually by certification staff.
-        /// </summary>
-        /// <returns>True if the User's Email was confirmed.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool confirmAccount()
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("userId", userId.ToString());
-            mySql.setQuery("UPDATE [userWeb] Set isConfirmed = 1 WHERE userId = @userId");
-            if (mySql.executeSQL() == 1) return true;
-            return false;
-        }
-
 
 
         /// <summary>
@@ -652,23 +373,6 @@ namespace CertifyWPF.WPF_User
         //
         // Static Methods
         //
-
-        /// <summary>
-        /// Get the primary key Id of the User based on a User's role.
-        /// </summary>
-        /// <param name="role">"userWeb", "userAuditor", "userStaff", "userLab"</param>
-        /// <param name="roleId">The primary key Id of the userWeb, userAuditor, userStaff or userLab table.</param>
-        /// <returns>The primary key Id of the User</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static long getUserIdFromRole(string role, long roleId)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("id", roleId.ToString());
-            DataTable records = mySql.getRecords("SELECT userId FROM " + role + " WHERE id = @id");
-            if (records.Rows.Count == 1) return Convert.ToInt64(records.Rows[0]["userId"].ToString());
-            return -1;
-        }
-
 
 
         /// <summary>

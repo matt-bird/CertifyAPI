@@ -1,4 +1,5 @@
-﻿using CertifyWPF.WPF_User;
+﻿using CertifyWPF.WPF_Library;
+using CertifyWPF.WPF_User;
 using Microsoft.Owin.Security.OAuth;
 using System;
 using System.Collections.Generic;
@@ -36,12 +37,13 @@ namespace CertifyWPF.Provider
                 var id = new ClaimsIdentity(context.Options.AuthenticationType);
                 id.AddClaim(new Claim("sub", context.UserName));
                 id.AddClaim(new Claim("role", "user"));
-
                 context.Validated(id);
+                Log.write("Access Granted for: " + user.fullName);
                 return;
             }
 
-            else  context.Rejected();
+            Log.write("Access Denied for: " + user.fullName);
+            context.Rejected();
         }
     }
 }
