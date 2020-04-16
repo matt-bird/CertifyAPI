@@ -24,8 +24,12 @@ namespace CertifyWPF.Provider
             // Password Success
             User user = User.getFromEmailAddress(context.UserName);
 
+            string hashedPassword;
+            if (String.IsNullOrEmpty(user.passwordSalt)) hashedPassword = FormsAuthentication.HashPasswordForStoringInConfigFile(context.Password, "SHA256");
+            else hashedPassword = FormsAuthentication.HashPasswordForStoringInConfigFile(user.passwordSalt + context.Password, "SHA256");
+
             if (user!= null && 
-                user.password == context.Password && 
+                user.password == hashedPassword && 
                 user.active == true)
             {
                 // create identity
