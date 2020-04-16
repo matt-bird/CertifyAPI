@@ -4,6 +4,7 @@ using System.IO;
 
 using CertifyWPF.WPF_Library;
 using CertifyWPF.WPF_Admin;
+using CertifyWPF.WPF_Utils;
 
 namespace CertifyWPF.WPF_User
 {
@@ -653,19 +654,6 @@ namespace CertifyWPF.WPF_User
         //
 
         /// <summary>
-        /// Get a User.
-        /// </summary>
-        /// <param name="userId">The primary key Id of the User.  Set to -1 if you want to use the currently logged in user.</param>
-        /// <returns>A User if one was found.  Null otherwise.</returns>
-        public static User getUser(long userId = -1)
-        {
-            if (userId == -1) userId = getLoggedInUserId();
-            if (userId == -1) return null;
-            return new User(userId);
-        }
-
-
-        /// <summary>
         /// Get the primary key Id of the User based on a User's role.
         /// </summary>
         /// <param name="role">"userWeb", "userAuditor", "userStaff", "userLab"</param>
@@ -682,150 +670,24 @@ namespace CertifyWPF.WPF_User
         }
 
 
-        /// <summary>
-        /// Get the currently logged in Users primary key Id.  This also supports impersonation for testing.
-        /// </summary>
-        /// <returns>The currently logged in Users primary key Id. </returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static long getLoggedInUserId()
-        {
-            // Check for impersonated user - only to be used by Developer when testing !!!!
-            long impersonatedUserId = getImpersonatedId();
-            if (impersonatedUserId != -1) return impersonatedUserId;
-
-            else
-            {
-                SQL mySql = new SQL();
-                mySql.addParameter("domainUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name);
-                DataTable records = mySql.getRecords("SELECT id FROM [user] WHERE domainUserName = @domainUserName");
-                if (records.Rows.Count == 1) return Convert.ToInt64(records.Rows[0]["id"].ToString());
-            }
-            return -1;
-        }
-
 
         /// <summary>
-        /// Get the impersonated Users Id - if one is being used.
+        /// Get the user based on an email address.
         /// </summary>
-        /// <returns>The impersonated Users Id - if one is being used. -1 otherwise.</returns>
+        /// <param name="email">The email address.</param>
+        /// <returns>The user based on an email address.</returns>
         //----------------------------------------------------------------------------------------------------------------------------
-        public static long getImpersonatedId()
-        {
-            // Check for impersonated user - only to be used by Developer when testing !!!!
-            string impersonatedUserIdAsString = Admin.getAdminValue("impersonateUserId");
-            if (!String.IsNullOrEmpty(impersonatedUserIdAsString))
-            {
-                return Convert.ToInt64(impersonatedUserIdAsString);
-            }
-            return -1;
-        }
-
-
-        /// <summary>
-        /// Get the Users Full Name.
-        /// </summary>
-        /// <param name="userId">The primary key Id of the User.  Set to -1 if you want to use the currently logged in user.</param>
-        /// <returns>The Users Full Name if found.  Null otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static string getUserFullName(long userId = -1)
-        {
-            if (userId == -1) userId = getLoggedInUserId();
-
-            SQL mySql = new SQL();
-            mySql.addParameter("id", userId.ToString());
-            DataTable records = mySql.getRecords("SELECT fullName FROM [user] WHERE id = @id");
-            if (records.Rows.Count == 1) return records.Rows[0]["fullName"].ToString();
-            return null;
-        }
-
-
-        /// <summary>
-        /// Get the Users Full Name.
-        /// </summary>
-        /// <param name="email">The email address of the User.</param>
-        /// <returns>The Users Full Name if found.  Null otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static string getUserFullName(string email)
+        public static User getFromEmailAddress(string email)
         {
             SQL mySql = new SQL();
             mySql.addParameter("email", email);
-            DataTable records = mySql.getRecords("SELECT fullName FROM [user] WHERE email = @email");
-            if (records.Rows.Count == 1) return records.Rows[0]["fullName"].ToString();
+            DataTable records = mySql.getRecords("SELECT * FROM [user] WHERE email = @email");
+            if (records.Rows.Count == 1)
+            {
+                long id = Utils.getLongFromString(records.Rows[0]["id"].ToString());
+                if (id != -1) return new User(id);
+            }
             return null;
-        }
-
-
-        /// <summary>
-        /// Get the primary key Id of the User.
-        /// </summary>
-        /// <param name="fullName">The User's full name.</param>
-        /// <returns>The primary key Id of the User if found.  -1 otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static long getUserId(string fullName)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("fullName", fullName.ToString());
-            DataTable records = mySql.getRecords("SELECT id FROM [user] WHERE fullName = @fullName");
-            if (records.Rows.Count == 1) return Convert.ToInt64(records.Rows[0]["id"].ToString());
-            return -1;
-        }
-
-
-        /// <summary>
-        /// Get the Users Full Name if they are an Auditor.
-        /// </summary>
-        /// <param name="auditorId">The primary key Id of the UserAuditor.</param>
-        /// <returns>The Users Full Name if found.  Null otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static string getAuditorFullName(long auditorId)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("auditorId", auditorId.ToString());
-            DataTable records = mySql.getRecords("SELECT [user].fullName FROM [user] " + 
-                                                 "INNER JOIN userAuditor ON [user].id = userAuditor.userId " + 
-                                                 "WHERE userAuditor.id = @auditorId");
-
-            if (records.Rows.Count == 1) return records.Rows[0]["fullName"].ToString();
-            return null;
-        }
-
-
-        /// <summary>
-        /// Get the userAuditor primary key Id of a User if they are an Auditor.
-        /// </summary>
-        /// <param name="fullName">The User's full name.</param>
-        /// <returns>The userAuditor primary key Id of a User if they are an Auditor. -1 otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static long getAuditorId(string fullName)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("fullName", fullName);
-            DataTable records = mySql.getRecords("SELECT userAuditor.id FROM [user] " +
-                                                 "INNER JOIN userAuditor ON [user].id = userAuditor.userId " +
-                                                 "WHERE [user].fullName = @fullName");
-
-            if (records.Rows.Count == 1) return Convert.ToInt64(records.Rows[0]["id"].ToString());
-            return -1;
-        }
-
-
-
-        /// <summary>
-        /// Get the userAuditor primary key Id of a User if they are an Auditor.
-        /// </summary>
-        /// <param name="userId">The primary key id of the User.</param>
-        /// <returns>The userAuditor primary key Id of a User if they are an Auditor. -1 otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static long getAuditorIdFromUserId(long userId)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("userId", userId.ToString());
-            DataTable records = mySql.getRecords("SELECT userAuditor.id FROM [user] " +
-                                                 "INNER JOIN userAuditor ON [user].id = userAuditor.userId " +
-                                                 "WHERE [user].id = @userId");
-
-            if (records.Rows.Count == 1) return Convert.ToInt64(records.Rows[0]["id"].ToString());
-            return -1;
         }
 
 
@@ -843,116 +705,6 @@ namespace CertifyWPF.WPF_User
             DataTable records = mySql.getRecords("SELECT * FROM userAuditor WHERE id = @auditorId");
             if (records.Rows.Count == 1) return Convert.ToInt64(records.Rows[0]["userId"].ToString());
             return -1;
-        }
-
-
-        /// <summary>
-        /// Get the name of the User from the User's userAuditor primary key Id.
-        /// </summary>
-        /// <param name="auditorId">The primary key Id of the UserAuditor.</param>
-        /// <returns>The name of the User if found.  Null otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static string getUserNameFromAuditorId(long auditorId)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("auditorId", auditorId.ToString());
-            DataTable records = mySql.getRecords("SELECT * FROM userAuditor WHERE id = @auditorId");
-            if (records.Rows.Count == 1)
-            {
-                User user = new User (Convert.ToInt64(records.Rows[0]["userId"].ToString()));
-                return user.fullName;
-            }
-            return null;
-        }
-
-
-        /// <summary>
-        /// Get the primary key Id of the User from the User's userWeb primary key Id.
-        /// </summary>
-        /// <param name="webUserId">The primary key Id of the UserWeb.</param>
-        /// <returns>The primary key Id of the User if found.  -1 otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static long getUserIdFromWebUserId(long webUserId)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("webUserId", webUserId.ToString());
-            DataTable records = mySql.getRecords("SELECT * FROM userWeb WHERE id = @webUserId");
-            if (records.Rows.Count == 1) return Convert.ToInt64(records.Rows[0]["userId"].ToString());
-            return -1;
-        }
-
-
-        /// <summary>
-        /// Get a User's email address.
-        /// </summary>
-        /// <param name="userId">The primary key Id of the User.  Set to -1 if you want to use the currently logged in user.</param>
-        /// <returns>The User's email address if found.  Null otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static string getUserEmailAddress(long userId = -1)
-        {
-            if (userId == -1) userId = getLoggedInUserId();
-
-            SQL mySql = new SQL();
-            mySql.addParameter("id", userId.ToString());
-            DataTable records = mySql.getRecords("SELECT email FROM [user] WHERE id = @id");
-            if (records.Rows.Count == 1) return records.Rows[0]["email"].ToString();
-            return null;
-        }
-
-
-        /// <summary>
-        /// Determine if an Email address is already being used by a User.
-        /// </summary>
-        /// <param name="email">The Email address to search for.</param>
-        /// <returns>True if an Email address is already being used by a User. False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static bool emailExists(string email)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("email", email);
-            DataTable records = mySql.getRecords("SELECT * FROM [user] WHERE email = @email");
-            if (records.Rows.Count == 1) return true;
-            return false;
-        }
-
-
-        /// <summary>
-        /// Determine if an User fullname is already being used by a User.
-        /// </summary>
-        /// <param name="fullName">The Full Name to search for.</param>
-        /// <returns>True if the fullname is already being used by a User. False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public static bool fullNameExists(string fullName)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("fullName", fullName);
-            DataTable records = mySql.getRecords("SELECT * FROM [user] WHERE fullName = @fullName");
-            if (records.Rows.Count > 0) return true;
-            return false;
-        }
-
-
-        /// <summary>
-        /// Get the User primary key Id from the <strong>userSession</strong> table.  Everytime someone using the desktop 
-        /// application starts the application, a Session entry is created in the userSession table.  The entry is deleted on log off.
-        /// </summary>
-        /// <returns>The User primary key Id from the userSession table.</returns>
-        //--------------------------------------------------------------------------------------------------------------------------
-        public static long getUserIdFromSession()
-        {
-            SQL mySql = new SQL();
-            string sessionIdAsString = mySql.lookup("userSession", "userId", "machine = '" + Environment.MachineName + "'");
-            if (!String.IsNullOrEmpty(sessionIdAsString)) return Convert.ToInt64(sessionIdAsString);
-            return -1;
-        }
-
-
-        //--------------------------------------------------------------------------------------------------------------------------
-        public static int countActiveWebUsers()
-        {
-            SQL mySql = new SQL();
-            DataTable records = mySql.getRecords("SELECT * FROM userWeb WHERE isDeleted = 0");
-            return records.Rows.Count;
         }
     }
 }

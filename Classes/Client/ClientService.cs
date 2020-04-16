@@ -132,7 +132,7 @@ namespace CertifyWPF.WPF_Client
         /// </summary>
         /// <returns>True if the Upsert was successful.  False otherwise.</returns>
         //----------------------------------------------------------------------------------------------------------------------------
-        public bool save(bool addHistoryEntry = true)
+        public bool save()
         {
             SQL mySql = new SQL();
             mySql.addParameter("clientId", clientId.ToString());
@@ -154,7 +154,6 @@ namespace CertifyWPF.WPF_Client
                     {
                         // Insert worked - now add a history entry
                         id = mySql.getMaxId("clientService");
-                        if(addHistoryEntry) return addHistory();
                         return true;
                     }
                     else Log.write("An error ocurred while trying to add a service to the client. The service was not added to the client properly.");
@@ -172,33 +171,12 @@ namespace CertifyWPF.WPF_Client
                                  serviceStatusId = @serviceStatusId
                                  WHERE id = @id");
 
-                if (mySql.executeSQL() == 1)
-                {
-                    if (addHistoryEntry) return addHistory();
-                    return true;
-                }
+                if (mySql.executeSQL() == 1) return true;
+
                 else Log.write("There was an error while trying to update this service. The status has not changed properly.");
             }
 
             return false;
-        }
-
-
-        /// <summary>
-        /// Add a Client Service History entry for this Client Service.
-        /// </summary>
-        /// <param name="status">Optional: The Service status for this history entry.  Service statuses such as "Applied" and "Suspended" 
-        /// are defined in the <strong>serviceStatus</strong> table.  Default = null.</param>
-        /// <returns>True</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool addHistory(string status = null)
-        {
-            long statusId = serviceStatusId;
-
-            if (!String.IsNullOrWhiteSpace(status)) statusId = UtilsList.getServiceStatusId(status);
-            ClientServiceHistory history = new ClientServiceHistory(id);
-            history.addHistoryEntry(statusId);
-            return true;
         }
 
 
@@ -212,7 +190,7 @@ namespace CertifyWPF.WPF_Client
             SQL mySql = new SQL();
             mySql.addParameter("id", id.ToString());
             mySql.setQuery("UPDATE clientService SET isDeleted = 1 WHERE id = @id"); // We only mark it as deleted
-            if (mySql.executeSQL() == 1) return addHistory("Deleted");
+            if (mySql.executeSQL() == 1) return true;
             return false;
         }
 

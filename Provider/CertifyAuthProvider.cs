@@ -1,10 +1,12 @@
-﻿using Microsoft.Owin.Security.OAuth;
+﻿using CertifyWPF.WPF_User;
+using Microsoft.Owin.Security.OAuth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Security;
 
 namespace CertifyWPF.Provider
 {
@@ -19,20 +21,21 @@ namespace CertifyWPF.Provider
 
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-            // validate user credentials (demo!)
-            // user credentials should be stored securely (salted, iterated, hashed yada)
-            if (context.UserName != context.Password)
+            // Password Success
+            User user = User.getFromEmailAddress(context.UserName);
+
+            if (user.password == context.Password && user.active == true)
             {
-                context.Rejected();
+                // create identity
+                var id = new ClaimsIdentity(context.Options.AuthenticationType);
+                id.AddClaim(new Claim("sub", context.UserName));
+                id.AddClaim(new Claim("role", "user"));
+
+                context.Validated(id);
                 return;
             }
 
-            // create identity
-            var id = new ClaimsIdentity(context.Options.AuthenticationType);
-            id.AddClaim(new Claim("sub", context.UserName));
-            id.AddClaim(new Claim("role", "user"));
-
-            context.Validated(id);
+            else  context.Rejected();
         }
     }
 }

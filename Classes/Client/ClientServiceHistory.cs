@@ -50,33 +50,5 @@ namespace CertifyWPF.WPF_Client
             serviceStatusId = -1;
             userId = -1;
         }
-
-
-        /// <summary>
-        /// Add a Client Service History entry.
-        /// </summary>
-        /// <param name="_serviceStatusId">The primary key Id of the Service Status.  Service statuses such as "Applied" or "Suspended" are defined in 
-        /// the <strong>serviceStatus</strong> table.</param>
-        /// <returns>True if the Client Service History entry was added successfully.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool addHistoryEntry(long _serviceStatusId)
-        {
-            SQL mySql = new SQL();
-            mySql.addParameter("clientServiceId", clientServiceId.ToString());
-            mySql.addParameter("serviceStatusId", _serviceStatusId.ToString());
-            mySql.addParameter("userId", User.getUserIdFromSession().ToString());
-
-            mySql.setQuery("INSERT INTO clientServiceHistory (clientServiceId, serviceStatusId, userId) " +
-                            "VALUES (@clientServiceId, @serviceStatusId, @userId)");
-
-            // Make sure we got exactly 1 row 
-            if (mySql.executeSQL() != 1)
-            {
-                Log.write("An error ocurred while trying to add a history entry.");
-                return false;
-            }
-
-            return true;
-        }
     }
 }
