@@ -12,7 +12,7 @@ namespace CertifyWPF.Controllers
     {
         public string Get()
         {
-            return "Status: OK";
+            return DateTime.Now.ToShortDateString() + ", Status: OK";
         }
     }
 }
