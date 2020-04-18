@@ -563,7 +563,7 @@ namespace CertifyWPF.WPF_Client
         /// </summary>
         /// <returns>A list of clients.</returns>
         //--------------------------------------------------------------------------------------------------------------------------
-        public static List<string[]> getClientDictionary()
+        public static List<string[]> getClientList()
         {
             List<string[]> list = new List<string[]>();
             SQL mySql = new SQL();

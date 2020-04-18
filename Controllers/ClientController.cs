@@ -13,7 +13,7 @@ namespace CertifyWPF.Controllers
         // GET: api/Client
         public List<string[]> Get()
         {
-            List<string[]> list = Client.getClientDictionary();
+            List<string[]> list = Client.getClientList();
             return list;
         }
 
