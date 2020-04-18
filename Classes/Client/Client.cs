@@ -563,16 +563,74 @@ namespace CertifyWPF.WPF_Client
         /// </summary>
         /// <returns>A list of clients.</returns>
         //--------------------------------------------------------------------------------------------------------------------------
-        public static List<string> getList()
+        public static List<Dictionary<long, string>> getClientDictionary()
         {
-            List<string> list = new List<string>();
+            List<Dictionary<long, string>> list = new List<Dictionary<long, string>>();
             SQL mySql = new SQL();
             DataTable records = mySql.getRecords("SELECT * FROM client WHERE isDeleted = 0 AND isTest = 0 ORDER BY company");
             foreach (DataRow row in records.Rows)
             {
-                list.Add(row["company"].ToString());
+                long id = Utils.getLongFromString(row["id"].ToString());
+                string name = row["company"].ToString();
+
+                if (id != -1)
+                {
+                    list.Add(new Dictionary<long, string> {{id, name}});     
+                }
             }
             return list;
         }
+
+
+        /// <summary>
+        /// Get the Clients company name without punctuation.
+        /// </summary>
+        /// <param name="inCompanyName">The fully punctuated Client's name.</param>
+        /// <returns>The Clients company name without punctuation.</returns>
+        //--------------------------------------------------------------------------------------------------------------------------
+        public static string cleanClientName(string inCompanyName)
+        {
+            string name = inCompanyName;
+            name = name.Replace(".", " ");
+            name = name.Replace(",", " ");
+            name = name.Replace("'", " ");
+            name = name.Replace("/", " ");
+
+            // Remove trailing spaces by splitting the string using spaces, and rebuilding
+            string[] nameParts = name.Split(' ');
+
+            name = "";
+            int count = 0;
+            for (int i = 0; i < nameParts.Length; i++)
+            {
+                if (!String.IsNullOrEmpty(nameParts[i]))
+                {
+                    if (count == 0)
+                    {
+                        name += nameParts[i];
+                        count++;
+                    }
+                    else name += " " + nameParts[i];
+                }
+            }
+            return name;
+        }
+
+
+        /// <summary>
+        /// Get the primary key Id of a Client.
+        /// </summary>
+        /// <param name="name">The Client's company name.</param>
+        /// <returns>The primary key Id of a client if it is found. -1 otherwise.</returns>
+        //--------------------------------------------------------------------------------------------------------------------------
+        public static long getId(string name)
+        {
+            SQL mySql = new SQL();
+            mySql.addParameter("name", name);
+            DataTable records = mySql.getRecords("SELECT id FROM client WHERE (company = @name OR tradingAs = @name)");
+            if (records.Rows.Count == 1) return Convert.ToInt64(records.Rows[0]["id"].ToString());
+            return -1;
+        }
+
     }
 }

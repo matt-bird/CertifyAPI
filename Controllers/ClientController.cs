@@ -11,9 +11,10 @@ namespace CertifyWPF.Controllers
     public class ClientController : ApiController
     {
         // GET: api/Client
-        public IEnumerable<string> Get()
+        public List<Dictionary<long, string>> Get()
         {
-            return Client.getList();
+            List<Dictionary<long, string>> list =  Client.getClientDictionary();
+            return list;
         }
 
         // GET: api/Client/5
