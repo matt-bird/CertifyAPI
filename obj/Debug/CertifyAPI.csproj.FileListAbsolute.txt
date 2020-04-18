@@ -50,8 +50,6 @@ C:\GIT\CertifyAPI\bin\roslyn\vbc.exe.config
 C:\GIT\CertifyAPI\bin\roslyn\vbc.rsp
 C:\GIT\CertifyAPI\bin\roslyn\VBCSCompiler.exe
 C:\GIT\CertifyAPI\bin\roslyn\VBCSCompiler.exe.config
-C:\GIT\CertifyAPI\bin\MaterialDesignColors.dll
-C:\GIT\CertifyAPI\bin\MaterialDesignThemes.Wpf.dll
 C:\GIT\CertifyAPI\bin\Microsoft.Owin.dll
 C:\GIT\CertifyAPI\bin\Microsoft.Owin.Host.SystemWeb.dll
 C:\GIT\CertifyAPI\bin\Microsoft.Owin.Security.dll
@@ -61,9 +59,6 @@ C:\GIT\CertifyAPI\bin\Owin.dll
 C:\GIT\CertifyAPI\bin\System.Net.Http.Formatting.dll
 C:\GIT\CertifyAPI\bin\System.Web.Http.dll
 C:\GIT\CertifyAPI\bin\System.Web.Http.WebHost.dll
-C:\GIT\CertifyAPI\bin\MaterialDesignColors.pdb
-C:\GIT\CertifyAPI\bin\MaterialDesignThemes.Wpf.pdb
-C:\GIT\CertifyAPI\bin\MaterialDesignThemes.Wpf.xml
 C:\GIT\CertifyAPI\bin\Microsoft.Owin.xml
 C:\GIT\CertifyAPI\bin\Microsoft.Owin.Host.SystemWeb.xml
 C:\GIT\CertifyAPI\bin\Microsoft.Owin.Security.xml
@@ -77,3 +72,5 @@ C:\GIT\CertifyAPI\obj\Debug\CertifyAPI.csproj.CoreCompileInputs.cache
 C:\GIT\CertifyAPI\obj\Debug\CertifyAPI.csproj.CopyComplete
 C:\GIT\CertifyAPI\obj\Debug\CertifyAPI.dll
 C:\GIT\CertifyAPI\obj\Debug\CertifyAPI.pdb
+C:\GIT\CertifyAPI\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+C:\GIT\CertifyAPI\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
