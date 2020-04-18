@@ -44,14 +44,14 @@ namespace CertifyWPF.WPF_Client
         public string town { get; set; }
 
         /// <summary>
-        /// The primary key Id of the Australian state.  States are defined in the <strong>list_state</strong> table.
+        /// The Australian state.  States are defined in the <strong>list_state</strong> table.
         /// </summary>
-        public long list_stateId { get; set; }
+        public string state { get; set; }
 
         /// <summary>
-        /// The primary key Id of the country.  Countries are defined in the <strong>list_country</strong> table.
+        /// The country.  Countries are defined in the <strong>list_country</strong> table.
         /// </summary>
-        public long list_countryId { get; set; }
+        public string country{ get; set; }
 
         /// <summary>
         /// The region of the address - this is currently not being used.
@@ -87,11 +87,6 @@ namespace CertifyWPF.WPF_Client
         /// When the restriction ends.
         /// </summary>
         public DateTime restrictionEndDate { get; set; }
-
-        /// <summary>
-        /// What is the current modifier primary key ID for the Client Address.
-        /// </summary>
-        public long list_clientAddressModifierId { get; set; }
 
         /// <summary>
         /// What is the text description of the current modifier for certified items coming from this address.
@@ -157,8 +152,8 @@ namespace CertifyWPF.WPF_Client
             street1 = null;
             street2 = null;
             town = null;
-            list_stateId = -1;
-            list_countryId = -1;
+            state = null;
+            country = null;
             region = null;
             postcode = null;
             prettyAddress = null;
@@ -167,7 +162,6 @@ namespace CertifyWPF.WPF_Client
             restrictionEndDate = new DateTime(1970, 1, 1);
             appliedDate = new DateTime(1970, 1, 1);
             certifiedOrganicDate = new DateTime(1970, 1, 1);
-            list_clientAddressModifierId = -1;
             modifier = null;
             isOperationAddress = false;
             isPostalAddress = false;
@@ -193,8 +187,8 @@ namespace CertifyWPF.WPF_Client
             street1 = null;
             street2 = null;
             town = null;
-            list_stateId = -1;
-            list_countryId = -1;
+            state = null;
+            country = null;
             region = null;
             postcode = null;
             prettyAddress = null;
@@ -203,7 +197,6 @@ namespace CertifyWPF.WPF_Client
             restrictionEndDate = new DateTime(1970, 1, 1);
             appliedDate = new DateTime(1970, 1, 1);
             certifiedOrganicDate = new DateTime(1970, 1, 1);
-            list_clientAddressModifierId = -1;
             modifier = null;
             isOperationAddress = false;
             isPostalAddress = false;
@@ -239,9 +232,15 @@ namespace CertifyWPF.WPF_Client
                 street2 = row["street2"].ToString();
 
                 string stateIdAsString = row["list_stateId"].ToString();
-                if(!String.IsNullOrEmpty(stateIdAsString)) list_stateId = Convert.ToInt64(stateIdAsString);
+                if (!String.IsNullOrEmpty(stateIdAsString))
+                {
+                    long list_stateId = Convert.ToInt64(stateIdAsString);
+                    state = UtilsList.getStateName(list_stateId);
+                }
 
-                list_countryId = Convert.ToInt64(row["list_countryId"].ToString());
+                long list_countryId = Convert.ToInt64(row["list_countryId"].ToString());
+                country = UtilsList.getCountryName(list_countryId);
+
                 town = row["town"].ToString();
                 region = row["region"].ToString();
                 postcode = row["postcode"].ToString();
@@ -255,7 +254,7 @@ namespace CertifyWPF.WPF_Client
                 string modifierIdAsString = row["list_clientAddressModifierId"].ToString();
                 if (!String.IsNullOrEmpty(modifierIdAsString))
                 {
-                    list_clientAddressModifierId = Convert.ToInt64(modifierIdAsString);
+                    long list_clientAddressModifierId = Convert.ToInt64(modifierIdAsString);
                     modifier = UtilsList.getClientAddressModifierName(list_clientAddressModifierId);
                 }
 
@@ -296,10 +295,10 @@ namespace CertifyWPF.WPF_Client
             mySql.addParameter("street2", street2);
             mySql.addParameter("town", town);
 
-            if(list_stateId == -1) mySql.addParameter("list_stateId", null);
-            else mySql.addParameter("list_stateId", list_stateId.ToString());
+            if(String.IsNullOrEmpty(state)) mySql.addParameter("list_stateId", null);
+            else mySql.addParameter("list_stateId", UtilsList.getStateId(state).ToString());
 
-            mySql.addParameter("list_countryId", list_countryId.ToString());
+            mySql.addParameter("list_countryId", UtilsList.getCountryId(country).ToString());
             mySql.addParameter("region", region);
             mySql.addParameter("postcode", postcode);
             mySql.addParameter("restriction", restriction);
@@ -314,7 +313,7 @@ namespace CertifyWPF.WPF_Client
             if (certifiedOrganicDate != new DateTime(1970, 1, 1)) mySql.addParameter("certifiedOrganicDate", certifiedOrganicDate.ToString("yyyy-MM-dd"));
             else mySql.addParameter("certifiedOrganicDate", null);
 
-            mySql.addParameter("list_clientAddressModifierId", list_clientAddressModifierId.ToString());
+            mySql.addParameter("list_clientAddressModifierId", UtilsList.getClientAddressModifierId(modifier).ToString());
 
             if (isOperationAddress) mySql.addParameter("isOperationAddress", "1");
             else mySql.addParameter("isOperationAddress", "0");
@@ -433,8 +432,8 @@ namespace CertifyWPF.WPF_Client
             string str = street1;
             if (!String.IsNullOrEmpty(street2)) str += ", " + street2;
             if (!String.IsNullOrEmpty(town)) str += ", " + town;
-            if (list_stateId != -1) str += ", " + UtilsList.getStateName(list_stateId, shorter);
-            if (list_countryId != -1 && !shorter) str += ", " + UtilsList.getCountryName(list_countryId);
+            if (!String.IsNullOrEmpty(state)) str += ", " + state;
+            if (!String.IsNullOrEmpty(country)) str += ", " + country;
             if (!String.IsNullOrEmpty(postcode)) str += ", " + postcode;
             if (!String.IsNullOrEmpty(propertyName) && includePropertyName) str += " (" + propertyName + ")";
 
@@ -472,8 +471,8 @@ namespace CertifyWPF.WPF_Client
             mySql.addParameter("clientId", clientId.ToString());
             mySql.addParameter("street1", street1);
             mySql.addParameter("town", town);
-            mySql.addParameter("list_stateId", list_stateId.ToString());
-            mySql.addParameter("list_countryId", list_countryId.ToString());
+            mySql.addParameter("list_stateId", UtilsList.getStateId(state).ToString());
+            mySql.addParameter("list_countryId", UtilsList.getCountryId(country).ToString());
             mySql.addParameter("postcode", postcode);
 
             DataTable records = mySql.getRecords(@"SELECT * FROM clientAddress WHERE 
@@ -494,10 +493,10 @@ namespace CertifyWPF.WPF_Client
         /// </summary>
         /// <returns>The Certified Item modifier if one can be found, -1 otherwise.</returns>
         //--------------------------------------------------------------------------------------------------------------------------
-        public long getCertifiedItemModifierId()
+        public long getAddressModifierId()
         {
             SQL mySql = new SQL();
-            mySql.addParameter("list_clientAddressModifierId", list_clientAddressModifierId.ToString());
+            mySql.addParameter("list_clientAddressModifierId", UtilsList.getClientAddressModifierId(modifier).ToString());
             DataTable records = mySql.getRecords("SELECT * FROM list_clientAddressModifier WHERE id = @list_clientAddressModifierId");
             if (records.Rows.Count == 1) return Convert.ToInt64(records.Rows[0]["list_certifiedItemModifieId"].ToString());
             return -1;
@@ -519,13 +518,13 @@ namespace CertifyWPF.WPF_Client
             if (deleteExisting) clearUses();
             foreach (ClientCategory cat in client.clientCategories)
             {
-                List<long> useIds = cat.getUses();
-                foreach(long useId in useIds)
+                List<string> addressUses = cat.getUses();
+                foreach(string _addressUse in addressUses)
                 {
                     ClientAddressUse newUse = new ClientAddressUse()
                     {
                         clientAddressId = id,
-                        list_clientAddressUseId = useId
+                        addressUse = _addressUse
                     };
                     addUse(newUse);
                 }
@@ -546,11 +545,10 @@ namespace CertifyWPF.WPF_Client
 
             foreach (string newUse in newUses)
             {
-                long newUseId = UtilsList.getClientAddressUseId(newUse);
                 ClientAddressUse use = new ClientAddressUse()
                 {
                     clientAddressId = id,
-                    list_clientAddressUseId = newUseId
+                    addressUse = newUse
                 };
                 addUse(use);
             }
@@ -569,7 +567,7 @@ namespace CertifyWPF.WPF_Client
             // Only add if the use has not already been added
             foreach(ClientAddressUse use in uses)
             {
-                if (use.list_clientAddressUseId == newUse.list_clientAddressUseId) return false;
+                if (use.addressUse == newUse.addressUse) return false;
             }
             uses.Add(newUse);
             return true;
@@ -591,21 +589,21 @@ namespace CertifyWPF.WPF_Client
                 ClientAddressUse recordsUse = new ClientAddressUse()
                 {
                     clientAddressId = id,
-                    list_clientAddressUseId = UtilsList.getClientAddressUseId("Records")
+                    addressUse = "Records"
                 };
                 uses.Add(recordsUse);
 
                 ClientAddressUse labellingUse = new ClientAddressUse()
                 {
                     clientAddressId = id,
-                    list_clientAddressUseId = UtilsList.getClientAddressUseId("Labelling")
+                    addressUse = "Labelling"
                 };
                 uses.Add(labellingUse);
 
                 ClientAddressUse packagingUse = new ClientAddressUse()
                 {
                     clientAddressId = id,
-                    list_clientAddressUseId = UtilsList.getClientAddressUseId("Packaging")
+                    addressUse = "Packaging"
                 };
                 uses.Add(packagingUse);
             }
@@ -685,7 +683,7 @@ namespace CertifyWPF.WPF_Client
             List<ClientAddress> addresses = getClientAddresses(client);
             foreach(ClientAddress address in addresses)
             {
-                if (address.list_clientAddressModifierId == -1) return false;
+                if (String.IsNullOrEmpty(address.modifier)) return false;
             }
             return true;
         }
@@ -703,7 +701,7 @@ namespace CertifyWPF.WPF_Client
             List<ClientAddress> addresses = getClientAddresses(client);
             foreach (ClientAddress address in addresses)
             {
-                long certifiedItemModifierId = address.getCertifiedItemModifierId();
+                long certifiedItemModifierId = address.getAddressModifierId();
                 if(UtilsList.getCertifiedItemModifierName(certifiedItemModifierId) != "Unknown")
                 {
                     bool found = false;

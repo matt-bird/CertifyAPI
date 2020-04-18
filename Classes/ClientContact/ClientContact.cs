@@ -25,10 +25,10 @@ namespace CertifyWPF.WPF_Client
         public long clientId { get; set; }
 
         /// <summary>
-        /// The primary key Id of the Contact Type.  Contact Types such as "Email - Work" or "Phone - Home" are defined in 
+        /// The  Contact Type.  Contact Types such as "Email - Work" or "Phone - Home" are defined in 
         /// the <strong>list_contactType</strong> table.
         /// </summary>
-        public long list_contactTypeId { get; set; }
+        public string contactType { get; set; }
 
         /// <summary>
         /// The name of the Client Contact.
@@ -58,7 +58,7 @@ namespace CertifyWPF.WPF_Client
         {
             id = -1;
             clientId = -1;
-            list_contactTypeId = -1;
+            contactType = null;
             name = null;
             preferredName = null;
             details = null;
@@ -74,7 +74,7 @@ namespace CertifyWPF.WPF_Client
         {
             id = _id;
             clientId = -1;
-            list_contactTypeId = -1;
+            contactType = null;
             name = null;
             preferredName = null;
             details = null;
@@ -98,7 +98,9 @@ namespace CertifyWPF.WPF_Client
             {
                 DataRow row = records.Rows[0];
                 clientId = Convert.ToInt64(row["clientId"].ToString());
-                list_contactTypeId = Convert.ToInt64(row["list_contactTypeId"].ToString());
+                long list_contactTypeId = Convert.ToInt64(row["list_contactTypeId"].ToString());
+                contactType = UtilsList.getContactType(list_contactTypeId);
+
                 name = row["name"].ToString();
                 preferredName = row["preferredName"].ToString();
                 details = row["details"].ToString();
@@ -118,7 +120,7 @@ namespace CertifyWPF.WPF_Client
         {
             SQL mySql = new SQL();
             mySql.addParameter("clientId", clientId.ToString());
-            mySql.addParameter("list_contactTypeId", list_contactTypeId.ToString());
+            mySql.addParameter("list_contactTypeId", UtilsList.getContactTypeId(contactType).ToString());
             mySql.addParameter("name", name);
             mySql.addParameter("preferredName", preferredName);
             mySql.addParameter("details", details);

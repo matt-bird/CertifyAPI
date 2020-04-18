@@ -25,9 +25,9 @@ namespace CertifyWPF.WPF_Client
         /// </summary>
         public long clientId { get; set; }
 
-        /// <summary>The primary key Id of the category.  Client categories such as "Produce - Livestock" are defined in 
+        /// <summary>The category.  Client categories such as "Produce - Livestock" are defined in 
         /// the <strong>list_clientCategory</strong> table.</summary>
-        public long list_clientCategoryId { get; set; }
+        public string category { get; set; }
 
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace CertifyWPF.WPF_Client
         {
             id = -1;
             clientId = -1;
-            list_clientCategoryId = -1;
+            category = null;
         }
 
 
@@ -51,7 +51,7 @@ namespace CertifyWPF.WPF_Client
         {
             id = _id;
             clientId = -1;
-            list_clientCategoryId = -1;
+            category = null;
 
             fetch();
         }
@@ -72,7 +72,9 @@ namespace CertifyWPF.WPF_Client
             {
                 DataRow row = records.Rows[0];
                 clientId = Convert.ToInt64(row["clientId"].ToString());
-                list_clientCategoryId = Convert.ToInt64(row["list_clientCategoryId"].ToString());
+
+                long list_clientCategoryId = Convert.ToInt64(row["list_clientCategoryId"].ToString());
+                category = UtilsList.getClientCategoryName(list_clientCategoryId);
                 return true;
             }
             return false;
@@ -86,10 +88,12 @@ namespace CertifyWPF.WPF_Client
         //----------------------------------------------------------------------------------------------------------------------------
         public bool save()
         {
-            if (clientId == -1 || list_clientCategoryId == -1) return false;
+            if (clientId == -1 || String.IsNullOrEmpty(category)) return false;
+            long list_clientCategoryId = UtilsList.getClientCategoryId(category);
+
             SQL mySql = new SQL();
-            mySql.addParameter("clientId", clientId.ToString());
-            mySql.addParameter("list_clientCategoryId", list_clientCategoryId.ToString());
+            mySql.addParameter("clientId", clientId.ToString());           
+            mySql.addParameter("list_clientCategoryId",  list_clientCategoryId.ToString());
 
             // save
             if (id == -1)
@@ -186,18 +190,26 @@ namespace CertifyWPF.WPF_Client
         /// </summary>
         /// <returns>The primary key IDs of the Client Address uses that are associated with this Client Category</returns>
         ///--------------------------------------------------------------------------------------------------------------------------
-        public List<long> getUses()
+        public List<string> getUses()
         {
-            List<long> uses = new List<long>();
+            List<string> uses = new List<string>();
 
             SQL mySql = new SQL();
-            mySql.addParameter("list_clientCategoryId", list_clientCategoryId.ToString());
+            mySql.addParameter("categoryName", category);
 
-            DataTable records = mySql.getRecords(@"SELECT * FROM clientCategoryToClientAddressUse WHERE list_clientCategoryId = @list_clientCategoryId");
+            DataTable records = mySql.getRecords(@"SELECT        
+                                                   clientCategoryToClientAddressUse.id, 
+                                                   list_clientCategory.name AS category, 
+                                                   list_clientAddressUse.name AS addressUse
+                                                   FROM            
+                                                   clientCategoryToClientAddressUse INNER JOIN 
+                                                   list_clientCategory ON clientCategoryToClientAddressUse.list_clientCategoryId = list_clientCategory.id INNER JOIN
+                                                   list_clientAddressUse ON clientCategoryToClientAddressUse.list_clientAddressUseId = list_clientAddressUse.id 
+                                                   WHERE 
+                                                   list_clientCategory.name = @categoryName");
             foreach(DataRow row in records.Rows)
             {
-                long useId = Utils.getLongFromString(row["list_clientAddressUseId"].ToString());
-                if (useId != -1) uses.Add(useId);
+                uses.Add(row["addressUse"].ToString());
             }
             return uses;
         }

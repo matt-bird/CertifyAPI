@@ -32,10 +32,10 @@ namespace CertifyWPF.WPF_Client
         public long serviceId { get; set; }
 
         /// <summary>
-        /// The primary key Id of the Service Status.  Service statuses such as "Applied" and "Suspended" 
+        /// The Service Status.  Service statuses such as "Applied" and "Suspended" 
         /// are defined in the <strong>serviceStatus</strong> table.
         /// </summary>
-        public long serviceStatusId { get; set; }
+        public string status { get; set; }
 
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace CertifyWPF.WPF_Client
             id = -1;
             clientId = -1;
             serviceId = -1;
-            serviceStatusId = -1;
+            status = null;
         }
 
 
@@ -61,7 +61,7 @@ namespace CertifyWPF.WPF_Client
             id = _id;
             clientId = -1;
             serviceId = -1;
-            serviceStatusId = -1;
+            status = null;
 
             fetch();
         }
@@ -77,7 +77,7 @@ namespace CertifyWPF.WPF_Client
         {
             clientId = _clientId;
             serviceId = _serviceId;
-            serviceStatusId = -1;
+            status = null;
 
             id = find();
         }
@@ -120,7 +120,8 @@ namespace CertifyWPF.WPF_Client
                 DataRow row = records.Rows[0];
                 clientId = Convert.ToInt64(row["clientId"].ToString());
                 serviceId = Convert.ToInt64(row["serviceId"].ToString());
-                serviceStatusId = Convert.ToInt64(row["serviceStatusId"].ToString());
+                long serviceStatusId = Convert.ToInt64(row["serviceStatusId"].ToString());
+                status = UtilsList.getServiceStatus(serviceStatusId);
                 return true;
             }
             return false;
@@ -137,7 +138,7 @@ namespace CertifyWPF.WPF_Client
             SQL mySql = new SQL();
             mySql.addParameter("clientId", clientId.ToString());
             mySql.addParameter("serviceId", serviceId.ToString());
-            mySql.addParameter("serviceStatusId", serviceStatusId.ToString());
+            mySql.addParameter("serviceStatusId", UtilsList.getServiceStatusId(status).ToString());
 
             // save
             if (id == -1)

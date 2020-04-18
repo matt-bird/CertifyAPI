@@ -389,12 +389,9 @@ namespace CertifyWPF.WPF_Client
         //-----------------------------------------------------------------------------------------------------------------------------
         public bool hasCategory(string catName)
         {
-            long id = UtilsList.getClientCategoryId(catName);
-            if (id == -1) return false;
-
             foreach (ClientCategory cat in clientCategories)
             {
-                if (cat.list_clientCategoryId == id) return true;
+                if (cat.category == catName) return true;
             }
             return false;
         }
@@ -477,27 +474,6 @@ namespace CertifyWPF.WPF_Client
                 }
             }
             return true;
-        }
-
-
-        /// <summary>
-        /// Get the state primary key id for the addresses of this client. 
-        /// </summary>
-        /// <returns>The state primary key id for the addresses of this client. If there is more than 1 stateId, return -1</returns>
-        //-------------------------------------------------------------------------------------------------------------
-        public long getStateId()
-        {
-            long stateId = -1;
-            List<ClientAddress> addresses = ClientAddress.getClientAddresses(this);
-            foreach (ClientAddress address in addresses)
-            {
-                if (address.list_stateId != -1)
-                {
-                    if (stateId == -1) stateId = address.list_stateId;
-                }
-                else if (address.list_stateId != stateId) return -1;
-            }
-            return stateId;
         }
 
 

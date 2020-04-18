@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 
 using CertifyWPF.WPF_Library;
+using CertifyWPF.WPF_Utils;
 
 namespace CertifyWPF.WPF_Client
 {
@@ -23,9 +24,9 @@ namespace CertifyWPF.WPF_Client
         public long clientAddressId { get; set; }
 
         /// <summary>
-        /// The primary key Id of the address use type such as "Records" or "Labelling".  This list is kept in the <strong>list_clientAddressUse</strong>database table.
+        /// The address use type such as "Records" or "Labelling".  This list is kept in the <strong>list_clientAddressUse</strong>database table.
         /// </summary>
-        public long list_clientAddressUseId { get; set; }
+        public string addressUse { get; set; }
 
 
         /// <summary>
@@ -36,7 +37,7 @@ namespace CertifyWPF.WPF_Client
         {
             id = -1;
             clientAddressId = -1;
-            list_clientAddressUseId = -1;
+            addressUse = null;
         }
 
 
@@ -48,7 +49,7 @@ namespace CertifyWPF.WPF_Client
         {
             id = _id;
             clientAddressId = -1;
-            list_clientAddressUseId = -1;
+            addressUse = null;
 
             fetch();
         }
@@ -69,7 +70,8 @@ namespace CertifyWPF.WPF_Client
             if (records.Rows.Count == 1)
             {
                 clientAddressId = Convert.ToInt64(records.Rows[0]["clientAddressId"].ToString());
-                list_clientAddressUseId = Convert.ToInt64(records.Rows[0]["list_clientAddressUseId"].ToString());
+                long list_clientAddressUseId = Convert.ToInt64(records.Rows[0]["list_clientAddressUseId"].ToString());
+                addressUse = UtilsList.getClientAddressUse(list_clientAddressUseId);
                 return true;
             }
             return false;
@@ -86,7 +88,7 @@ namespace CertifyWPF.WPF_Client
             // Form Query
             SQL mySql = new SQL();
             mySql.addParameter("clientAddressId", clientAddressId.ToString());
-            mySql.addParameter("list_clientAddressUseId", list_clientAddressUseId.ToString());
+            mySql.addParameter("list_clientAddressUseId", UtilsList.getClientAddressUseId(addressUse).ToString());
 
             if (id == -1)
             {

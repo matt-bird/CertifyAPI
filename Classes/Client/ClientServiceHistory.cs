@@ -11,9 +11,6 @@ namespace CertifyWPF.WPF_Client
     /// through - such as "Applied" or "Suspended". Client Service History entries are stored in the 
     /// <strong>clientServiceHistory</strong> table.
     /// </summary>
-    /// <seealso cref="ClientService"/>
-    /// <seealso cref="Client"/>
-    /// <seealso cref="Service"/>
 
     public class ClientServiceHistory
     {
@@ -31,7 +28,7 @@ namespace CertifyWPF.WPF_Client
         /// The primary key Id of the Service Status.  Service statuses such as "Applied" or "Suspended" are defined in 
         /// the <strong>serviceStatus</strong> table.
         /// </summary>
-        public long serviceStatusId { get; set; }
+        public string status { get; set; }
 
         /// <summary>
         /// The primary key Id of the user who added the Client Service History entry.
@@ -47,7 +44,7 @@ namespace CertifyWPF.WPF_Client
         {
             id = -1;
             clientServiceId = _clientServiceId;
-            serviceStatusId = -1;
+            status = null;
             userId = -1;
         }
     }

@@ -112,7 +112,6 @@
     <Compile Include="Classes\Client\ClientService.cs" />
     <Compile Include="Classes\Client\ClientServiceHistory.cs" />
     <Compile Include="Classes\Service\Service.cs" />
-    <Compile Include="Classes\Service\ServiceStat.cs" />
     <Compile Include="Classes\User\User.cs" />
     <Compile Include="Controllers\ClientContactController.cs" />
     <Compile Include="Controllers\ClientController.cs" />
