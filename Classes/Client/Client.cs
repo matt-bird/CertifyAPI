@@ -563,20 +563,16 @@ namespace CertifyWPF.WPF_Client
         /// </summary>
         /// <returns>A list of clients.</returns>
         //--------------------------------------------------------------------------------------------------------------------------
-        public static List<Dictionary<long, string>> getClientDictionary()
+        public static List<string[]> getClientDictionary()
         {
-            List<Dictionary<long, string>> list = new List<Dictionary<long, string>>();
+            List<string[]> list = new List<string[]>();
             SQL mySql = new SQL();
             DataTable records = mySql.getRecords("SELECT * FROM client WHERE isDeleted = 0 AND isTest = 0 ORDER BY company");
             foreach (DataRow row in records.Rows)
             {
-                long id = Utils.getLongFromString(row["id"].ToString());
-                string name = row["company"].ToString();
-
-                if (id != -1)
-                {
-                    list.Add(new Dictionary<long, string> {{id, name}});     
-                }
+                string id = row["id"].ToString();
+                string name = row["company"].ToString();                
+                   list.Add(new string[] { id, name });              
             }
             return list;
         }
