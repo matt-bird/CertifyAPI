@@ -556,5 +556,23 @@ namespace CertifyWPF.WPF_Client
             }
             return false;
         }
+
+
+        /// <summary>
+        /// Get a list of clients.
+        /// </summary>
+        /// <returns>A list of clients.</returns>
+        //--------------------------------------------------------------------------------------------------------------------------
+        public static List<string> getList()
+        {
+            List<string> list = new List<string>();
+            SQL mySql = new SQL();
+            DataTable records = mySql.getRecords("SELECT * FROM client WHERE isDeleted = 0 AND isTest = 0 ORDER BY company");
+            foreach (DataRow row in records.Rows)
+            {
+                list.Add(row["company"].ToString());
+            }
+            return list;
+        }
     }
 }
