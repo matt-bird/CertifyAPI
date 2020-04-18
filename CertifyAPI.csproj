@@ -115,6 +115,7 @@
     <Compile Include="Classes\User\User.cs" />
     <Compile Include="Controllers\ClientContactController.cs" />
     <Compile Include="Controllers\ClientController.cs" />
+    <Compile Include="Controllers\ServiceController.cs" />
     <Compile Include="Controllers\StatusController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
