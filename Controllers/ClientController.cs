@@ -18,15 +18,14 @@ namespace CertifyWPF.Controllers
         }
 
         // GET: api/Client/5
-        public string Get(long id)
+        public Client Get(long id)
         {
             if (id != -1)
             {
                 Client client = new Client(id);
-                if (!String.IsNullOrEmpty(client.company))
-                    return JsonConvert.SerializeObject(client, Newtonsoft.Json.Formatting.Indented);
+                if (!String.IsNullOrEmpty(client.company))return client;
             }
-            return "Error - Client Not Found - Fuck off";
+            return null;
         }
 
         // POST: api/Client
