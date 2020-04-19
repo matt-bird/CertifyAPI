@@ -717,6 +717,44 @@ namespace CertifyWPF.WPF_Client
 
 
         /// <summary>
+        /// Get a list of all contacts.
+        /// </summary>
+        /// <returns>A list of clients.</returns>
+        //--------------------------------------------------------------------------------------------------------------------------
+        public static List<ClientAddress> getAddressList(long clientId = -1)
+        {
+            List<ClientAddress> list = new List<ClientAddress>();
+            SQL mySql = new SQL();
+            DataTable records;
+            if (clientId != -1)
+            {
+                mySql.addParameter("clientId", clientId.ToString());
+                records = mySql.getRecords(@"SELECT * FROM            
+                                             clientAddress
+                                             WHERE
+                                             clientId = @clientId AND
+                                             isDeleted = 0");
+            }
+            else
+            {
+                records = mySql.getRecords(@"SELECT * FROM            
+                                             clientAddress
+                                             WHERE
+                                             isDeleted = 0");
+            }
+            foreach (DataRow row in records.Rows)
+            {
+                long id = Utils.getLongFromString(row["id"].ToString());
+                if(id != -1)
+                {
+                    list.Add(new ClientAddress(id));
+                }               
+            }
+            return list;
+        }
+
+
+        /// <summary>
         /// Counts how many Client Addresses have restrictions ending today (or earlier).
         /// </summary>
         /// <returns>The number of Client Services that have restrictions ending today (or earlier).</returns>

@@ -69,6 +69,7 @@ C:\GIT\CertifyAPI\bin\Newtonsoft.Json.xml
 C:\GIT\CertifyAPI\bin\System.Net.Http.Formatting.xml
 C:\GIT\CertifyAPI\bin\System.Web.Http.xml
 C:\GIT\CertifyAPI\bin\System.Web.Http.WebHost.xml
+C:\GIT\CertifyAPI\obj\Release\CertifyAPI.csprojAssemblyReference.cache
 C:\GIT\CertifyAPI\obj\Release\CertifyAPI.csproj.CoreCompileInputs.cache
 C:\GIT\CertifyAPI\obj\Release\CertifyAPI.csproj.CopyComplete
 C:\GIT\CertifyAPI\obj\Release\CertifyAPI.dll

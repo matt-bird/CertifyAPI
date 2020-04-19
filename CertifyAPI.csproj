@@ -107,12 +107,13 @@
     <Compile Include="Classes\Client\ClientAddressUse.cs" />
     <Compile Include="Classes\Client\ClientAuditCycle.cs" />
     <Compile Include="Classes\Client\ClientCategory.cs" />
-    <Compile Include="Classes\ClientContact\ClientContact.cs" />
-    <Compile Include="Classes\ClientContact\ClientContactListItem.cs" />
+    <Compile Include="Classes\Client\ClientContact\ClientContact.cs" />
+    <Compile Include="Classes\Client\ClientContact\ClientContactListItem.cs" />
     <Compile Include="Classes\Client\ClientService.cs" />
     <Compile Include="Classes\Client\ClientServiceHistory.cs" />
     <Compile Include="Classes\Service\Service.cs" />
     <Compile Include="Classes\User\User.cs" />
+    <Compile Include="Controllers\ClientAddressController.cs" />
     <Compile Include="Controllers\ClientContactController.cs" />
     <Compile Include="Controllers\ClientController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
