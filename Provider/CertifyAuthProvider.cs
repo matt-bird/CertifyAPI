@@ -36,7 +36,9 @@ namespace CertifyWPF.Provider
                 // create identity
                 var id = new ClaimsIdentity(context.Options.AuthenticationType);
                 id.AddClaim(new Claim("sub", context.UserName));
-                id.AddClaim(new Claim("role", "user"));
+                if (user.isUserRole("userWeb")) id.AddClaim(new Claim("role", "web"));
+                if (user.isUserRole("userAuditor")) id.AddClaim(new Claim("role", "auditor"));
+                if (user.isAdmin) id.AddClaim(new Claim("role", "admin"));
                 context.Validated(id);
                 Log.write("Access Granted for: " + user.fullName);
                 return;

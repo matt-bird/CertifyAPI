@@ -26,20 +26,6 @@ namespace CertifyWPF.WPF_User
         /// </summary>
         public long userId { get; set; }
 
-        /// <summary>
-        /// The primary key Id of this Users entry in the <strong>userWeb</strong> table.
-        /// </summary>
-        public long webId { get; set; }
-
-        /// <summary>
-        /// The primary key Id of this Users entry in the <strong>userAuditor</strong> table.
-        /// </summary>
-        public long auditorId { get; set; }
-
-        /// <summary>
-        /// The primary key Id of this Users entry in the <strong>userStaff</strong> table.
-        /// </summary>
-        public long staffId { get; set; }
 
         /// <summary>
         /// The full name of the User.
@@ -114,9 +100,6 @@ namespace CertifyWPF.WPF_User
         public User()
         {
             userId = -1;
-            webId = -1;
-            auditorId = -1;
-            staffId = -1;
             email = null;
             password = "6732F21FF7E8A7A76CE0426C76BE0B0155352D67C588608C8BF8D7FF4AB6B0A6"; // Default Password = h0neyB33
             passwordSalt = "cRdWiWpJEjPZ8gjq6P1SQLkHTuM=";
@@ -142,9 +125,6 @@ namespace CertifyWPF.WPF_User
         public User(long _userId)
         {
             userId = _userId;
-            webId = -1;
-            auditorId = -1;
-            staffId = -1;
             email = null;
             password = null;
             passwordSalt = null;
@@ -284,25 +264,6 @@ namespace CertifyWPF.WPF_User
 
 
         /// <summary>
-        /// Determine if a Web User has been assigned to a Client (that is, the Web User is an authorised User for a Client).
-        /// </summary>
-        /// <param name="clientId">The primary key Id of the Client.</param>
-        /// <returns>True if the Web User is an authroised user for the Client.  False otherwise.</returns>
-        //----------------------------------------------------------------------------------------------------------------------------
-        public bool doesUserBelongToClient(long clientId)
-        {
-            if (webId == -1 || clientId == -1) return false;
-
-            SQL mySql = new SQL();
-            mySql.addParameter("userWebId", webId.ToString());
-            mySql.addParameter("clientId", clientId.ToString());
-            DataTable records = mySql.getRecords("SELECT * FROM userWebClient WHERE (userWebId = @userWebId AND clientId = @clientId)");
-            if (records.Rows.Count == 1) return true;
-            return false;
-        }
-
-
-        /// <summary>
         /// Get the users first name.
         /// </summary>
         /// <returns>The users first name.</returns>
@@ -356,18 +317,21 @@ namespace CertifyWPF.WPF_User
 
 
         /// <summary>
-        /// Gets the users email attachments network folder.
+        /// Determine if a User has a particular role such as "Auditor" or "Staff"
         /// </summary>
-        /// <returns>The users email attachments network folder</returns>
-        //-----------------------------------------------------------------------------------------------------------------------------------------
-        public string getEmailAttachmentsFolder(bool autoCreate = true)
+        /// <param name="role">"userWeb", "userAuditor", "userStaff", "userLab"</param>
+        /// <returns>True if the User has the role.  False otherwise.</returns>
+        //----------------------------------------------------------------------------------------------------------------------------
+        public bool isUserRole(string role)
         {
-            string attachmentsFolder = getFolder(true) + "\\Email\\Attachments";
-            if (autoCreate && !Directory.Exists(attachmentsFolder)) Directory.CreateDirectory(attachmentsFolder);
+            if (userId == -1) return false;
 
-            return attachmentsFolder;
+            SQL mySql = new SQL();
+            mySql.addParameter("userId", userId.ToString());
+            DataTable records = mySql.getRecords("SELECT * FROM " + role + " WHERE isDeleted = 0 AND userId = @userId");
+            if (records.Rows.Count == 1) return true;
+            return false;
         }
-
 
 
         //

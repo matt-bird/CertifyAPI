@@ -8,6 +8,7 @@ using System.Web.Http;
 
 namespace CertifyWPF.Controllers
 {
+    [Authorize(Roles = "admin, auditor")]
     public class ClientContactController : ApiController
     {
         // GET: api/ClientContact - Gets all client contacts

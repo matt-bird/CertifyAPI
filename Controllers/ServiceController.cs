@@ -5,6 +5,7 @@ using System.Web.Http;
 
 namespace CertifyWPF.Controllers
 {
+    [Authorize(Roles = "admin, auditor")]
     public class ServiceController : ApiController
     {
         // GET: api/Service

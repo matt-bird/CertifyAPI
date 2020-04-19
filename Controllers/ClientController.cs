@@ -7,7 +7,7 @@ using CertifyWPF.WPF_Client;
 
 namespace CertifyWPF.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "admin, auditor")]
     public class ClientController : ApiController
     {
         // GET: api/Client
