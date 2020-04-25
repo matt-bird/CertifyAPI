@@ -11,9 +11,9 @@ namespace CertifyWPF.Controllers
     public class ClientController : ApiController
     {
         // GET: api/Client
-        public List<string[]> Get(int maxCount)
+        public List<string[]> Get()
         {
-            List<string[]> list = Client.getClientList(maxCount);
+            List<string[]> list = Client.getClientList(10);
             return list;
         }
 
