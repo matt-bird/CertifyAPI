@@ -4,18 +4,27 @@ using System.Collections.Generic;
 using System.Web.Http;
 
 using CertifyWPF.WPF_Client;
+using CertifyWPF.WPF_Utils;
 
 namespace CertifyWPF.Controllers
 {
     [Authorize(Roles = "admin, auditor")]
     public class ClientController : ApiController
     {
-        // GET: api/Client
+        // GET: api/client?criteria=someName
         public List<string[]> Get(string criteria)
         {
             List<string[]> list = Client.getClientList(criteria);
             return list;
         }
+
+        // GET: api/Client
+        public List<string[]> Get()
+        {
+            List<string[]> list = Client.getClientList();
+            return list;
+        }
+
 
         // GET: api/Client/5
         public Client Get(long id)
@@ -26,21 +35,6 @@ namespace CertifyWPF.Controllers
                 if (!String.IsNullOrEmpty(client.company))return client;
             }
             return null;
-        }
-
-        // POST: api/Client
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT: api/Client/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE: api/Client/5
-        public void Delete(int id)
-        {
         }
     }
 }

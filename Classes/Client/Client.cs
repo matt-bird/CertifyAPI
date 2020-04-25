@@ -539,16 +539,18 @@ namespace CertifyWPF.WPF_Client
         /// </summary>
         /// <returns>A list of clients.</returns>
         //--------------------------------------------------------------------------------------------------------------------------
-        public static List<string[]> getClientList(string criteria)
+        public static List<string[]> getClientList(string criteria = null)
         {
             List<string[]> list = new List<string[]>();
             SQL mySql = new SQL();
-            DataTable records = mySql.getRecords("SELECT * FROM client WHERE company LIKE '%" + criteria + "%' isDeleted = 0 AND isTest = 0 ORDER BY company");
+            DataTable records;
+            if(String.IsNullOrEmpty(criteria)) records = mySql.getRecords("SELECT * FROM client WHERE isDeleted = 0 AND isTest = 0 ORDER BY company");
+            else records = mySql.getRecords("SELECT * FROM client WHERE company LIKE '%" + criteria + "%' AND isDeleted = 0 AND isTest = 0 ORDER BY company");
             foreach (DataRow row in records.Rows)
             {
                 string id = row["id"].ToString();
                 string name = row["company"].ToString();                
-                   list.Add(new string[] { id, name });              
+                list.Add(new string[] { id, name });              
             }
             return list;
         }
