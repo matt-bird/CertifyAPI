@@ -539,11 +539,11 @@ namespace CertifyWPF.WPF_Client
         /// </summary>
         /// <returns>A list of clients.</returns>
         //--------------------------------------------------------------------------------------------------------------------------
-        public static List<string[]> getClientList(int maxCount)
+        public static List<string[]> getClientList(string criteria)
         {
             List<string[]> list = new List<string[]>();
             SQL mySql = new SQL();
-            DataTable records = mySql.getRecords("SELECT TOP (" + maxCount.ToString() + ") * FROM client WHERE isDeleted = 0 AND isTest = 0 ORDER BY company");
+            DataTable records = mySql.getRecords("SELECT * FROM client WHERE company LIKE '%" + criteria + "%' isDeleted = 0 AND isTest = 0 ORDER BY company");
             foreach (DataRow row in records.Rows)
             {
                 string id = row["id"].ToString();
