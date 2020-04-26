@@ -101,6 +101,9 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Classes\Admin\Admin.cs" />
+    <Compile Include="Classes\Audit\Audit.cs" />
+    <Compile Include="Classes\Audit\AuditAddress.cs" />
+    <Compile Include="Classes\Audit\AuditService.cs" />
     <Compile Include="Classes\Client\Client.cs" />
     <Compile Include="Classes\Client\ClientAddress.cs" />
     <Compile Include="Classes\Client\ClientAddressSample.cs" />
@@ -112,11 +115,14 @@
     <Compile Include="Classes\Client\ClientService.cs" />
     <Compile Include="Classes\Client\ClientServiceHistory.cs" />
     <Compile Include="Classes\Service\Service.cs" />
+    <Compile Include="Classes\Status\Status.cs" />
+    <Compile Include="Classes\Status\StatusFactory.cs" />
     <Compile Include="Classes\User\User.cs" />
     <Compile Include="Controllers\ClientAddressController.cs" />
     <Compile Include="Controllers\ClientContactController.cs" />
     <Compile Include="Controllers\ClientController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
+    <Compile Include="Controllers\SXCStatusController.cs" />
     <Compile Include="Controllers\StatusController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -148,6 +154,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Classes\Application\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <PropertyGroup>
