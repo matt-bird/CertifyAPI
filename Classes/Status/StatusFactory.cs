@@ -1,6 +1,8 @@
-﻿using CertifyWPF.WPF_Library;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
+
+using CertifyWPF.WPF_Library;
 
 namespace CertifyWPF.WPF_Status
 {
@@ -188,6 +190,7 @@ namespace CertifyWPF.WPF_Status
         public static Status getAuditWarnings()
         {
             SQL mySql = new SQL();
+            mySql.addParameter("dateDue", DateTime.Now.AddDays(14).ToString("yyy-MM-dd"));
             DataTable records = mySql.getRecords(@"SELECT id
                                                    FROM vw_audits
                                                    WHERE 
@@ -201,7 +204,6 @@ namespace CertifyWPF.WPF_Status
 
             return getStatus(records.Rows.Count, "Audit Warning");
         }
-
 
 
         //-------------------------------------------------------------------------------------------------------------
