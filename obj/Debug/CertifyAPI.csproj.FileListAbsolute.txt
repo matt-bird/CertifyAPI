@@ -73,4 +73,3 @@ C:\GIT\CertifyAPI\obj\Debug\CertifyAPI.csproj.CoreCompileInputs.cache
 C:\GIT\CertifyAPI\obj\Debug\CertifyAPI.csproj.CopyComplete
 C:\GIT\CertifyAPI\obj\Debug\CertifyAPI.dll
 C:\GIT\CertifyAPI\obj\Debug\CertifyAPI.pdb
-C:\GIT\CertifyAPI\obj\Debug\CertifyAPI.csprojAssemblyReference.cache
