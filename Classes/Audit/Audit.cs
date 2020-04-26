@@ -597,6 +597,37 @@ namespace CertifyWPF.WPF_Audit
                 if(id != -1) audits.Add(new Audit(id));
             }
             return audits;
-        }       
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="criteria">Can be open, created, allocated, docs sent, planned, processed</param>
+        /// <returns></returns>
+        //--------------------------------------------------------------------------------------------------------------------------
+        public static List<Audit> getAudits(string criteria)
+        {
+            List<Audit> list = new List<Audit>();
+            SQL mySql = new SQL();
+
+            // Get the query
+            string query;
+            if (criteria == "open") query = "SELECT * FROM vw_audits WHERE isTest = 0 AND isDeleted = 0 AND status <> 'Finished' AND status <> 'Cancelled' ";
+            else 
+            {
+                mySql.addParameter("status", criteria);
+                query = "SELECT * FROM vw_audits WHERE isTest = 0 AND isDeleted = 0 AND status = @status";
+            }
+
+            DataTable records = mySql.getRecords(query);
+            foreach(DataRow row in records.Rows)
+            {
+                long id = Utils.getLongFromString(row["id"].ToString());
+                if (id != -1) list.Add(new Audit(id));
+            }
+            
+            return list;
+        }
     }
 }

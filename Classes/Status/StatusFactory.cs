@@ -253,7 +253,7 @@ namespace CertifyWPF.WPF_Status
         {
             SQL mySql = new SQL();
             DataTable records = mySql.getRecords(@"SELECT * FROM vw_web_applicationStaleCheck");
-            return getStatus(records.Rows.Count, "Stale Applications");
+            return getStatus(records.Rows.Count, "Stale Application");
         }
 
 

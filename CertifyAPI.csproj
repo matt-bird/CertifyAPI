@@ -101,6 +101,8 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Classes\Admin\Admin.cs" />
+    <Compile Include="Classes\Application\WebApplication.cs" />
+    <Compile Include="Classes\Application\WebApplicationResponseView.cs" />
     <Compile Include="Classes\Audit\Audit.cs" />
     <Compile Include="Classes\Audit\AuditAddress.cs" />
     <Compile Include="Classes\Audit\AuditService.cs" />
@@ -118,6 +120,9 @@
     <Compile Include="Classes\Status\Status.cs" />
     <Compile Include="Classes\Status\StatusFactory.cs" />
     <Compile Include="Classes\User\User.cs" />
+    <Compile Include="Controllers\ApplicationController.cs" />
+    <Compile Include="Controllers\ApplicationResponseController.cs" />
+    <Compile Include="Controllers\AuditController.cs" />
     <Compile Include="Controllers\ClientAddressController.cs" />
     <Compile Include="Controllers\ClientContactController.cs" />
     <Compile Include="Controllers\ClientController.cs" />
@@ -154,7 +159,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Classes\Application\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <PropertyGroup>
