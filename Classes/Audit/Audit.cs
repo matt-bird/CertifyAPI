@@ -8,7 +8,7 @@ using CertifyWPF.WPF_Library;
 using CertifyWPF.WPF_Client;
 using CertifyWPF.WPF_Utils;
 using CertifyWPF.WPF_Service;
-
+using CertifyWPF.WPF_User;
 
 namespace CertifyWPF.WPF_Audit
 {
@@ -23,6 +23,11 @@ namespace CertifyWPF.WPF_Audit
         public long id { get; set; }
 
         /// <summary>
+        /// The primary key Id of the client.
+        /// </summary>
+        public long clientId { get; set; }
+
+        /// <summary>
         /// The primary key Id of an audit that this audit is linked to.
         /// </summary>
         public long clientGroupMemberId { get; set; }
@@ -30,7 +35,7 @@ namespace CertifyWPF.WPF_Audit
         /// <summary>
         /// The primary key Id for the audits client.
         /// </summary>
-        public long clientId { get; set; }
+        public string company { get; set; }
 
         /// <summary>
         /// The primary key Id of the web application, if this audit is associated with a web application. -1 otherwise.
@@ -43,14 +48,14 @@ namespace CertifyWPF.WPF_Audit
         public long invoiceId { get; set; }
 
         /// <summary>
-        /// The primary key Id of the lead auditor.  This is the userAuditor Id, not the user Id.
+        /// The lead auditor.
         /// </summary>
-        public long leadUserAuditorId { get; set; }
+        public string leadAuditor { get; set; }
 
         /// <summary>
-        /// The primary key Id of the trainee auditor if one exists.  -1 if there is no trainee for this audit. This is the userAuditor Id, not the user Id.
+        /// The trainee auditor if one exists. 
         /// </summary>
-        public long traineeUserAuditorId { get; set; }
+        public string traineeAuditor { get; set; }
 
         /// <summary>
         /// The primary key Id of the audit type.  Audit types (such as Annual or Initial) are specified in the <strong>list_auditType</strong> table.
@@ -144,12 +149,13 @@ namespace CertifyWPF.WPF_Audit
         public Audit()
         {
             id = -1;
-            clientGroupMemberId = -1;
             clientId = -1;
+            clientGroupMemberId = -1;
+            company = null;
             applicationId = -1;
             invoiceId = -1;
-            leadUserAuditorId = -1;
-            traineeUserAuditorId = -1;
+            leadAuditor = null;
+            traineeAuditor = null;
             auditType = null;
             auditStatus = null;
             plannedStartTime = null;
@@ -179,12 +185,13 @@ namespace CertifyWPF.WPF_Audit
         public Audit(long _Id)
         {
             id = _Id;
-            clientGroupMemberId = -1;
             clientId = -1;
+            clientGroupMemberId = -1;
+            company = null;
             applicationId = -1;
             invoiceId = -1;
-            leadUserAuditorId = -1;
-            traineeUserAuditorId = -1;
+            leadAuditor = null;
+            traineeAuditor = null;
             auditType = null;
             auditStatus = null;
             plannedStartTime = null;
@@ -225,6 +232,12 @@ namespace CertifyWPF.WPF_Audit
                 DataRow row = records.Rows[0];
 
                 clientId = Utils.getLongFromString(row["clientId"].ToString());
+                if(clientId != -1)
+                {
+                    Client client = new Client(clientId);
+                    company = client.company;
+                }
+
                 clientGroupMemberId = Utils.getLongFromString(row["clientGroupMemberId"].ToString());
                 applicationId = Utils.getLongFromString(row["applicationId"].ToString());
                 invoiceId = Utils.getLongFromString(row["invoiceId"].ToString());
@@ -235,8 +248,27 @@ namespace CertifyWPF.WPF_Audit
                 long list_auditStatusId = Utils.getLongFromString(row["list_auditStatusId"].ToString());
                 auditStatus = UtilsList.getAuditStatus(list_auditStatusId);
 
-                leadUserAuditorId = Utils.getLongFromString(row["leadUserAuditorId"].ToString());
-                traineeUserAuditorId = Utils.getLongFromString(row["traineeUserAuditorId"].ToString());
+                long leadUserAuditorId = Utils.getLongFromString(row["leadUserAuditorId"].ToString());
+                if(leadUserAuditorId != -1)
+                {
+                    long userId = User.getUserIdFromAuditorId(leadUserAuditorId);
+                    if(userId != -1)
+                    {
+                        User user = new User(userId);
+                        leadAuditor = user.fullName;
+                    }
+                }
+
+                long traineeUserAuditorId = Utils.getLongFromString(row["traineeUserAuditorId"].ToString());
+                if (traineeUserAuditorId != -1)
+                {
+                    long userId = User.getUserIdFromAuditorId(traineeUserAuditorId);
+                    if (userId != -1)
+                    {
+                        User user = new User(userId);
+                        traineeAuditor = user.fullName;
+                    }
+                }
 
                 auditDuration = Utils.getFloatFromString(row["auditDuration"].ToString());
                 auditExpenses = Utils.getFloatFromString(row["auditExpenses"].ToString());
@@ -363,7 +395,7 @@ namespace CertifyWPF.WPF_Audit
         //--------------------------------------------------------------------------------------------------------------------------
         private bool validate()
         {
-            if (leadUserAuditorId <= 0)
+            if (String.IsNullOrEmpty(leadAuditor))
             {
                 Log.write("Cannot save audit as no lead auditor has been set");
                 return false;

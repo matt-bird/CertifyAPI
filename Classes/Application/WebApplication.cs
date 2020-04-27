@@ -6,6 +6,7 @@ using CertifyWPF.WPF_Library;
 using CertifyWPF.WPF_Service;
 using CertifyWPF.WPF_Utils;
 using CertifyWPF.WPF_User;
+using CertifyWPF.WPF_Client;
 
 namespace CertifyWPF.WPF_Application
 {
@@ -35,13 +36,12 @@ namespace CertifyWPF.WPF_Application
         /// </summary>
         public long id { get; set; }
 
-        /// <summary>The foreign key to the client table.  Clients are only assigned after the 
-        /// application is processed.</summary>
-        public long clientId { get; set; }
+        /// <summary>The client for this application id one has been set</summary>
+        public string company { get; set; }
 
         /// <summary>The foreign key to the user table.  This is the user who created the 
         /// application in using Certify Web.</summary>
-        public long userId { get; set; }
+        public string userName { get; set; }
 
         /// <summary>The foreign key to the workflow table.  This list is specified in the 
         /// list_appWorkFlow table.</summary>
@@ -153,8 +153,8 @@ namespace CertifyWPF.WPF_Application
         public void setDefaults()
         {
             id = -1;
-            userId = -1;
-            clientId = -1;
+            userName = null;
+            company = null;
             workFlow = null;
 
             applicantName = null;
@@ -194,8 +194,16 @@ namespace CertifyWPF.WPF_Application
             if (records.Rows.Count == 1)
             {
                 DataRow row = records.Rows[0];
-                if (!String.IsNullOrEmpty(row["clientId"].ToString())) clientId = Utils.getLongFromString(row["clientId"].ToString());
-                userId = Utils.getLongFromString(row["userId"].ToString());
+                if (!String.IsNullOrEmpty(row["clientId"].ToString()))
+                {
+                    long clientId = Utils.getLongFromString(row["clientId"].ToString());
+                    Client client = new Client(clientId);
+                    company = client.company;
+                }
+                
+                long userId = Utils.getLongFromString(row["userId"].ToString());
+                User user = new User(userId);
+                userName = user.fullName;
                 
                 long list_appWorkFlowId = Utils.getLongFromString(row["list_appWorkFlowId"].ToString());
                 workFlow = UtilsList.getWorkFlowName(list_appWorkFlowId);
@@ -327,54 +335,6 @@ namespace CertifyWPF.WPF_Application
                                                  "source = @source AND " +
                                                  "itemId = @itemId");
             return records.Rows.Count;
-        }
-
-
-        /// <summary>
-        /// Determine if the associated invoice items have been paid.
-        /// </summary>
-        /// <param name="description">The item description - such as "Auditing Time" or "Laboratory Fees".</param>
-        /// <returns>True if the fees have been paid.  False otherwise.</returns>
-        //--------------------------------------------------------------------------------------------------------------------------
-        public bool hasInvoiceItemBeenPaid(string description)
-        {
-            if (type == "Organic Application")
-            {
-                SQL mySql = new SQL();
-                mySql.addParameter("clientId", clientId.ToString());
-                mySql.addParameter("description", description);
-                DataTable records = mySql.getRecords(@"SELECT * FROM vw_invoiceItems_clients WHERE 
-                                                       clientId = @clientId AND description = @description AND paymentId IS NULL");
-                if (records.Rows.Count > 0) return false;
-            }
-            return true;
-        }
-
-
-        /// <summary>
-        /// Determine if the certification or applicatiopn fees associated with this application have been paid.
-        /// </summary>
-        /// <param name="feeType">The fee type such as "Certification Fee" or "Application Fee"</param>
-        /// <returns>True if the fees have been paid.  False otherwise.</returns>
-        //--------------------------------------------------------------------------------------------------------------------------
-        public bool haveFeesBeenPaid(string feeType)
-        {
-            if(type != "Organic Export")
-            {
-                if (serviceIds.Count == 0) return false;
-                int successCount = 0;
-                foreach (long serviceId in serviceIds)
-                {
-                    SQL mySql = new SQL();
-                    mySql.addParameter("clientId", clientId.ToString());
-                    mySql.addParameter("description", feeType + " - " + Service.getTitle(serviceId));
-                    DataTable records = mySql.getRecords(@"SELECT * FROM vw_invoiceItems_clients WHERE 
-                                                           clientId = @clientId AND description = @description AND paymentId IS NULL");
-                    if (records.Rows.Count == 0) successCount++;
-                }
-                if (successCount == serviceIds.Count) return true;
-            }
-            return false;
         }
 
 
