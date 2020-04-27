@@ -101,11 +101,11 @@ namespace CertifyWPF.WPF_Application
         /// <summary>
         /// A list of Id's for the application's services.
         /// </summary>
-        public List<long> serviceIds { get; set; }
+        public List<string> services { get; set; }
 
         /// <summary>A list of Id's for the client categories that were chosen for the application.  
         /// Client Categories are specified in the list_clientCategory table.</summary>
-        public List<long> clientCategoryIds { get; set; }
+        public List<string> clientCategories { get; set; }
 
         /// <summary>
         /// A flag to indicate if this application gets charged an application Fee.  This 
@@ -173,8 +173,8 @@ namespace CertifyWPF.WPF_Application
             applicationFeeExempt = false;
 
             checkDate = new DateTime(1970, 1, 1);
-            serviceIds = new List<long>();
-            clientCategoryIds = new List<long>();
+            services = new List<string>();
+            clientCategories = new List<string>();
 
             isPlan = false;
         }
@@ -251,8 +251,9 @@ namespace CertifyWPF.WPF_Application
                     {
                         if (!String.IsNullOrEmpty(value))
                         {
+                            // Make sure this is a valid service
                             long serviceId = UtilsList.getServiceId(value);
-                            if (serviceId != -1) serviceIds.Add(serviceId);
+                            if (serviceId != -1) services.Add(value);
                         }
                     }
                     return true;
@@ -287,8 +288,9 @@ namespace CertifyWPF.WPF_Application
                 {
                     if (!String.IsNullOrEmpty(value))
                     {
+                        // Make sure this is a valid category
                         long catId = UtilsList.getClientCategoryId(value);
-                        if (catId != -1) clientCategoryIds.Add(catId);
+                        if (catId != -1) clientCategories.Add(value);
                     }
                 }
                 return true;
@@ -336,7 +338,6 @@ namespace CertifyWPF.WPF_Application
                                                  "itemId = @itemId");
             return records.Rows.Count;
         }
-
 
 
         /// <summary>
