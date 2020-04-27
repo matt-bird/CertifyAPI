@@ -520,11 +520,12 @@ namespace CertifyWPF.WPF_Application
                                               (isTestCompany = 0 OR isTestCompany IS NULL) AND 
                                               isDeleted = 0 AND 
                                               workflow <> 'Application Finished' AND 
-                                              workflow <> 'Application Cancelled'";
+                                              workflow <> 'Application Cancelled'
+                                              ORDER BY id DESC";
             else
             {
                 mySql.addParameter("workflow", criteria);
-                query = "SELECT * FROM vw_applications WHERE (isTestCompany = 0 OR isTestCompany IS NULL) AND isDeleted = 0 AND workflow = @workflow";
+                query = "SELECT * FROM vw_applications WHERE (isTestCompany = 0 OR isTestCompany IS NULL) AND isDeleted = 0 AND workflow = @workflow ORDER BY id DESC";
             }
 
             DataTable records = mySql.getRecords(query);

@@ -645,11 +645,18 @@ namespace CertifyWPF.WPF_Audit
 
             // Get the query
             string query;
-            if (criteria == "open") query = "SELECT * FROM vw_audits WHERE isTest = 0 AND isDeleted = 0 AND status <> 'Finished' AND status <> 'Cancelled' ";
+            if (criteria == "open") query = @"SELECT * FROM 
+                                              vw_audits 
+                                              WHERE 
+                                              isTest = 0 AND 
+                                              isDeleted = 0 AND 
+                                              status <> 'Finished' AND 
+                                              status <> 'Cancelled' 
+                                              ORDER BY id DESC";
             else 
             {
                 mySql.addParameter("status", criteria);
-                query = "SELECT * FROM vw_audits WHERE isTest = 0 AND isDeleted = 0 AND status = @status";
+                query = "SELECT * FROM vw_audits WHERE isTest = 0 AND isDeleted = 0 AND status = @status ORDER BY id DESC";
             }
 
             DataTable records = mySql.getRecords(query);
