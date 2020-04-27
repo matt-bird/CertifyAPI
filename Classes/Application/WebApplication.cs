@@ -118,6 +118,11 @@ namespace CertifyWPF.WPF_Application
         /// </summary>
         public DateTime checkDate { get; set; }
 
+        /// <summary>
+        /// The percent complete of the web application
+        /// </summary>
+        public int progress { get; set; }
+
 
         /// <summary>
         /// Constructor. Use this to create anew web application
@@ -177,6 +182,8 @@ namespace CertifyWPF.WPF_Application
             clientCategories = new List<string>();
 
             isPlan = false;
+
+            progress = 0;
         }
 
 
@@ -221,6 +228,7 @@ namespace CertifyWPF.WPF_Application
                 applicationFeeExempt = Convert.ToBoolean(row["applicationFeeExempt"].ToString());
                 checkDate = Utils.getDateTime(row["checkDate"].ToString());
                 isPlan = Convert.ToBoolean(row["isPlan"].ToString());
+                progress = Utils.getIntFromString(row["progress"].ToString());
                 return true;
             }
             else
