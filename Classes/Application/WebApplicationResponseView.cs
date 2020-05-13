@@ -66,7 +66,10 @@ namespace CertifyWPF.WPF_Application
             // Get the application information
             SQL mySql = new SQL();
             mySql.addParameter("web_applicationId", webApplicationId.ToString());
-            DataTable records = mySql.getRecords("SELECT * FROM vw_applicationResponses WHERE web_applicationId = @web_applicationId");
+            DataTable records = mySql.getRecords(@"SELECT * FROM vw_applicationResponses 
+                                                   WHERE 
+                                                   web_applicationId = @web_applicationId
+                                                   ORDER BY sectionSequence, questionSequence");
 
             if (records.Rows.Count >= 1)
             {

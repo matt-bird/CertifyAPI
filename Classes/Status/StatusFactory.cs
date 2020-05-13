@@ -20,6 +20,7 @@ namespace CertifyWPF.WPF_Status
             DEROGATION,
             INSPECTED_AUDIT,
             AUDIT_WARNING,
+            STALE_AUDIT,
             REJECTED_AUDIT,
             OVERDUE_CAR,
             ENDING_RESTRICTION,
@@ -43,6 +44,7 @@ namespace CertifyWPF.WPF_Status
             if (type == StatusType.DEROGATION) return getDerogations();
             if (type == StatusType.INSPECTED_AUDIT) return getInspectedAudits();
             if (type == StatusType.AUDIT_WARNING) return getAuditWarnings();
+            if (type == StatusType.STALE_AUDIT) return getStaleAudits();
             if (type == StatusType.REJECTED_AUDIT) return getRejectedAudits();
             if (type == StatusType.OVERDUE_CAR) return getOverdueCARs();
             if (type == StatusType.ENDING_RESTRICTION) return getEndingRestrictions();
@@ -204,6 +206,19 @@ namespace CertifyWPF.WPF_Status
 
             return getStatus(records.Rows.Count, "Audit Warning");
         }
+
+
+        //-------------------------------------------------------------------------------------------------------------
+        public static Status getStaleAudits()
+        {
+            SQL mySql = new SQL();
+            DataTable records = mySql.getRecords(@"SELECT id
+                                                   FROM vw_searchAudits
+                                                   WHERE 
+                                                   lastCheckDays >= 7");
+            return getStatus(records.Rows.Count, "Stale Audits");
+        }
+
 
 
         //-------------------------------------------------------------------------------------------------------------
