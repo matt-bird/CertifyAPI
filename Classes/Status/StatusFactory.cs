@@ -331,9 +331,11 @@ namespace CertifyWPF.WPF_Status
         {
             SQL mySql = new SQL();
             DataTable records = mySql.getRecords(@"SELECT id
-                                                   FROM vw_labels
-                                                   WHERE status = 'Applied' AND 
-                                                   decisionDateTime IS NULL");
+                                                   FROM   
+                                                   vw_labels
+                                                   WHERE        
+                                                   (status = N'Applied') AND (decisionDateTime IS NULL)
+                                                   GROUP BY id");
             return getStatus(records.Rows.Count, "New Label");
         }
 
