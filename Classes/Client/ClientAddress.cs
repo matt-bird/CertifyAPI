@@ -74,21 +74,6 @@ namespace CertifyWPF.WPF_Client
         public string prettyAddressShort { get; set; }
 
         /// <summary>
-        /// Any restrictions applied to this address - such as In-Conversion or Quarantine
-        /// </summary>
-        public string restriction { get; set; }
-
-        /// <summary>
-        /// Why the restriction exists - such as "Used prohibited input" or similar
-        /// </summary>
-        public string restrictionReason { get; set; }
-
-        /// <summary>
-        /// When the restriction ends.
-        /// </summary>
-        public DateTime restrictionEndDate { get; set; }
-
-        /// <summary>
         /// What is the text description of the current modifier for certified items coming from this address.
         /// </summary>
         public string modifier { get; set; }
@@ -157,9 +142,6 @@ namespace CertifyWPF.WPF_Client
             region = null;
             postcode = null;
             prettyAddress = null;
-            restriction = null;
-            restrictionReason = null;
-            restrictionEndDate = new DateTime(1970, 1, 1);
             appliedDate = new DateTime(1970, 1, 1);
             certifiedOrganicDate = new DateTime(1970, 1, 1);
             modifier = null;
@@ -192,9 +174,6 @@ namespace CertifyWPF.WPF_Client
             region = null;
             postcode = null;
             prettyAddress = null;
-            restriction = null;
-            restrictionReason = null;
-            restrictionEndDate = new DateTime(1970, 1, 1);
             appliedDate = new DateTime(1970, 1, 1);
             certifiedOrganicDate = new DateTime(1970, 1, 1);
             modifier = null;
@@ -244,10 +223,7 @@ namespace CertifyWPF.WPF_Client
                 town = row["town"].ToString();
                 region = row["region"].ToString();
                 postcode = row["postcode"].ToString();
-                restriction = row["restriction"].ToString();
-                restrictionReason = row["restrictionReason"].ToString();
 
-                restrictionEndDate = Utils.getDateTime(row["restrictionEndDate"].ToString());
                 appliedDate = Utils.getDateTime(row["appliedDate"].ToString());
                 certifiedOrganicDate = Utils.getDateTime(row["certifiedOrganicDate"].ToString());
 
@@ -301,11 +277,6 @@ namespace CertifyWPF.WPF_Client
             mySql.addParameter("list_countryId", UtilsList.getCountryId(country).ToString());
             mySql.addParameter("region", region);
             mySql.addParameter("postcode", postcode);
-            mySql.addParameter("restriction", restriction);
-            mySql.addParameter("restrictionReason", restrictionReason);
-
-            if (restrictionEndDate != new DateTime(1970,1,1)) mySql.addParameter("restrictionEndDate", restrictionEndDate.ToString("yyyy-MM-dd"));
-            else mySql.addParameter("restrictionEndDate", null);
 
             if (appliedDate != new DateTime(1970, 1, 1)) mySql.addParameter("appliedDate", appliedDate.ToString("yyyy-MM-dd"));
             else mySql.addParameter("appliedDate", null);
