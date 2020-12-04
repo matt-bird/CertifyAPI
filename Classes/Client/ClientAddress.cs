@@ -307,11 +307,11 @@ namespace CertifyWPF.WPF_Client
                 mySql.setQuery(@"INSERT INTO 
                                 clientAddress 
                                 (clientId, propertyName, street1, street2, town, list_stateId, list_countryId, postcode, region, 
-                                 restriction, restrictionReason, restrictionEndDate, appliedDate, certifiedOrganicDate, 
+                                 appliedDate, certifiedOrganicDate, 
                                  list_clientAddressModifierId, isOperationAddress, isPostalAddress, requiresAudit, auditedWithMain, latitude, longitude) 
                                 VALUES 
                                 (@clientId, @propertyName, @street1, @street2, @town, @list_stateId, @list_countryId, @postcode, @region, 
-                                 @restriction, @restrictionReason, @restrictionEndDate, @appliedDate, @certifiedOrganicDate, 
+                                 @appliedDate, @certifiedOrganicDate, 
                                  @list_clientAddressModifierId, @isOperationAddress, @isPostalAddress, @requiresAudit, @auditedWithMain, @latitude, @longitude)");
 
                 if (mySql.executeSQL() == 1)
@@ -338,9 +338,6 @@ namespace CertifyWPF.WPF_Client
                                  list_countryId = @list_countryId,
                                  postcode = @postcode,
                                  region = @region,
-                                 restriction = @restriction,
-                                 restrictionReason = @restrictionReason,
-                                 restrictionEndDate = @restrictionEndDate,
                                  appliedDate = @appliedDate,
                                  certifiedOrganicDate = @certifiedOrganicDate,
                                  list_clientAddressModifierId = @list_clientAddressModifierId,
@@ -734,22 +731,19 @@ namespace CertifyWPF.WPF_Client
         {
             SQL mySql = new SQL();
             mySql.addParameter("today", DateTime.Now.ToString("yyyy-MM-dd"));
-            DataTable records = mySql.getRecords(@"SELECT
-                                                   clientAddress.id, clientAddress.clientId, clientAddress.propertyName, clientAddress.street1, 
-                                                   clientAddress.street2, clientAddress.town, clientAddress.list_stateId, clientAddress.list_countryId, 
-                                                   clientAddress.postcode, clientAddress.region, clientAddress.restriction, clientAddress.restrictionReason, 
-                                                   clientAddress.list_clientAddressModifierId, clientAddress.appliedDate, clientAddress.certifiedOrganicDate, 
-                                                   clientAddress.isOperationAddress,clientAddress.isPostalAddress, clientAddress.requiresAudit, 
-                                                   clientAddress.latitude, clientAddress.longitude, clientAddress.auditedWithMain, clientAddress.restrictionEndDate, 
-                                                   clientAddress.isDeleted
+            DataTable records = mySql.getRecords(@"SELECT        
+                                                   clientAddressRestriction.id
                                                    FROM            
                                                    clientAddress 
                                                    INNER JOIN clientService ON clientAddress.clientId = clientService.clientId 
-                                                   INNER JOIN serviceStatus ON clientService.serviceStatusId = serviceStatus.id
-                                                   WHERE
-                                                   (clientAddress.isDeleted = 0) AND
-                                                   (clientAddress.restrictionEndDate <= GETDATE()) AND
-                                                   (serviceStatus.name = N'Active')");
+                                                   INNER JOIN serviceStatus ON clientService.serviceStatusId = serviceStatus.id 
+                                                   INNER JOIN clientAddressRestriction ON clientAddress.id = clientAddressRestriction.clientAddressId
+                                                   WHERE        
+                                                   (clientAddress.isDeleted = 0) AND 
+                                                   (clientAddressRestriction.endDate <= GETDATE()) AND 
+                                                   (clientAddressRestriction.acknowledged = 0) AND 
+                                                   (serviceStatus.name = N'Active') AND 
+                                                   (clientAddressRestriction.isDeleted = 0)");
             return records.Rows.Count;
         }
     }
